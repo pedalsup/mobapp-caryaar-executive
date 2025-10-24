@@ -97,7 +97,7 @@ axiosInstance.interceptors.response.use(
     const isTokenExpired = status === 401 || status === 402;
     if (isTokenExpired) {
       // Option 1: If using Redux
-      store.dispatch(setLogoutUser());
+      store.dispatch(logoutUser());
     }
 
     return Promise.reject(error);

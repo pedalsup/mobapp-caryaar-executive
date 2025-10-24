@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../components';
 import {
   PARTNER_TAB_OPTIONS,
   partnerOnboardingStatus,
@@ -19,6 +18,7 @@ import {
   setBasicDetails,
   setDealershipType,
   setDocumentDetails,
+  setIsExistingPartner,
   setLocationDetails,
   setPartnerRole,
   setSelectedPartner,
@@ -199,6 +199,7 @@ class PartnersScreen extends Component {
   onAddButtonPress = () => {
     this.props.resetRegistration();
     this.props.resetPartnerDetail();
+    this.props.setIsExistingPartner(false);
     navigate(ScreenNames.DealershipTypeSelection);
   };
 
@@ -315,6 +316,7 @@ const mapDispatchToProps = {
   setLocationDetails,
   setSellerType,
   fetchPartnerFromId,
+  setIsExistingPartner,
 };
 
 const mapStateToProps = ({partners}) => ({

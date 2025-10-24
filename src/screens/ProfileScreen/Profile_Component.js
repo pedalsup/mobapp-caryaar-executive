@@ -44,12 +44,12 @@ const Profile_Component = ({
         />
         {/* <Image source={images.placeholder_image} style={styles.profilePic} /> */}
         <View style={styles.infoSection}>
-          <Text
+          {/* <Text
             size={'small'}
             hankenGroteskSemiBold={true}
             color={theme.colors.primary}>
             {userID}
-          </Text>
+          </Text> */}
           <Text hankenGroteskBold={true} color={theme.colors.white}>
             {name}
           </Text>

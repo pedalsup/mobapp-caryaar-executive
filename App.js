@@ -16,7 +16,6 @@ export default function App() {
       </Provider>
       <View pointerEvents="none" style={{marginHorizontal: 20}}>
         <Toast
-          pointerEvents="none"
           config={toastConfig}
           // ref={ref => Toast.setRef(ref)}
         />

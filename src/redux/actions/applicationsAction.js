@@ -62,8 +62,9 @@ export const fetchLoanApplicationFromIdThunk = (id, onSuccess, onFailure) => {
       const response = await fetchLoanApplicationById(id);
       dispatch({
         type: types.FETCH_LOAN_APPLICATIONS_BY_ID_SUCCESS,
-        payload: response.data,
+        payload: response.data?.[0],
       });
+      console.log('response---->', JSON.stringify(response));
       onSuccess?.(response);
     } catch (error) {
       dispatch({

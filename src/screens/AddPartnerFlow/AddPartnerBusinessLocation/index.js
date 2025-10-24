@@ -6,7 +6,7 @@ import {
   goBack,
   navigate,
 } from '../../../navigation/NavigationUtils';
-import {setLocationDetails} from '../../../redux/actions';
+import {setLocationDetails, updatePartnerThunk} from '../../../redux/actions';
 import {
   handleFieldChange,
   showToast,
@@ -102,7 +102,7 @@ class AddPartnerBusinessLocation extends Component {
     handleFieldChange(this, key, value);
   };
 
-  handleNextPress = () => {
+  handleNextPress = async () => {
     const {
       companyName,
       shopNo,
@@ -111,7 +111,12 @@ class AddPartnerBusinessLocation extends Component {
       area,
       stateName,
       pincode,
+      fromScreen,
+      showImages,
+      errorSteps,
     } = this.state;
+
+    const {selectedPartnerId, isExistingPartner} = this.props;
 
     const isFormValid = this.validateAllFields();
 
@@ -119,7 +124,8 @@ class AddPartnerBusinessLocation extends Component {
       showToast('error', 'Required field cannot be empty.', 'bottom', 3000);
       return;
     }
-    this.props.setLocationDetails({
+
+    let payLoad = {
       companyName,
       shopNo,
       buildingName,
@@ -130,15 +136,30 @@ class AddPartnerBusinessLocation extends Component {
       latitude: '19.076',
       longitude: '72.877',
       city: 'Mumbai',
-    });
+    };
 
-    navigate(ScreenNames.AddPartnerRequiredDocument, {
-      params: {
-        fromScreen: this.state.fromScreen,
-        showImages: this.state.showImages,
-        errorSteps: this.state.errorSteps,
-      },
-    });
+    // Common navigation params
+    const navigationParams = {
+      params: {fromScreen, showImages, errorSteps},
+    };
+
+    if (!isExistingPartner) {
+      await this.props.updatePartnerThunk(
+        selectedPartnerId,
+        payLoad,
+        onSuccess => {
+          showToast('success', onSuccess.message);
+          if (onSuccess?.success) {
+            navigate(ScreenNames.AddPartnerRequiredDocument, navigationParams);
+          }
+        },
+        error => {},
+      );
+      return;
+    }
+
+    this.props.setLocationDetails(payLoad);
+    navigate(ScreenNames.AddPartnerRequiredDocument, navigationParams);
   };
 
   onGoogleMapPress = () => {
@@ -172,89 +193,91 @@ class AddPartnerBusinessLocation extends Component {
       cityName,
     } = this.state;
 
-    const {selectedPartner} = this.props;
+    const {selectedPartner, isLoading} = this.props;
 
     return (
-      <>
-        <Partner_Location_Form_Component
-          onBackPress={this.onBackPress}
-          handleNextPress={this.handleNextPress}
-          onChangeCompanyName={value =>
-            this.onChangeField('companyName', value)
-          }
-          onChangeShopNo={value => this.onChangeField('shopNo', value)}
-          onChangeBuildingName={value =>
-            this.onChangeField('buildingName', value)
-          }
-          onChangeStreet={value => this.onChangeField('street', value)}
-          onChangeArea={value => this.onChangeField('area', value)}
-          onChangePincode={value => this.onChangeField('pincode', value)}
-          onGoogleMapPress={this.onGoogleMapPress}
-          restInputProps={{
-            companyName: {
-              value: companyName,
-              isError: errors.companyName,
-              statusMsg: errors.companyName,
-            },
-            shopOfficeNumber: {
-              value: shopNo,
-              isError: errors.shopNo,
-              statusMsg: errors.shopNo,
-            },
-            buildingName: {
-              value: buildingName,
-              isError: errors.buildingName,
-              statusMsg: errors.buildingName,
-            },
-            street: {
-              value: street,
-              isError: errors.street,
-              statusMsg: errors.street,
-            },
-            area: {
-              value: area,
-              isError: errors.area,
-              statusMsg: errors.area,
-            },
-            state: {
-              value: stateName,
-              isError: errors.stateName,
-              statusMsg: errors.stateName,
-            },
-            pincode: {
-              value: pincode,
-              isError: errors.pincode,
-              statusMsg: errors.pincode,
-              rightLabel: cityName,
-              rightLabelPress: () => {},
-              keyboardType: 'numeric',
-              returnKeyType: 'done',
-              onSubmitEditing: this.handleNextPress,
-            },
-          }}
-          nextButtonDisabled={!isFormValid} // Disable the button if form is not valid
-          onSelectState={this.onSelectState}
-          stateName={stateName}
-          showImages={showImages}
-          errorSteps={errorSteps}
-          isNewPartner={
-            !selectedPartner || Object.keys(selectedPartner).length === 0
-          }
-        />
-      </>
+      <Partner_Location_Form_Component
+        onBackPress={this.onBackPress}
+        handleNextPress={this.handleNextPress}
+        onChangeCompanyName={value => this.onChangeField('companyName', value)}
+        onChangeShopNo={value => this.onChangeField('shopNo', value)}
+        onChangeBuildingName={value =>
+          this.onChangeField('buildingName', value)
+        }
+        onChangeStreet={value => this.onChangeField('street', value)}
+        onChangeArea={value => this.onChangeField('area', value)}
+        onChangePincode={value => this.onChangeField('pincode', value)}
+        onGoogleMapPress={this.onGoogleMapPress}
+        restInputProps={{
+          companyName: {
+            value: companyName,
+            isError: errors.companyName,
+            statusMsg: errors.companyName,
+          },
+          shopOfficeNumber: {
+            value: shopNo,
+            isError: errors.shopNo,
+            statusMsg: errors.shopNo,
+          },
+          buildingName: {
+            value: buildingName,
+            isError: errors.buildingName,
+            statusMsg: errors.buildingName,
+          },
+          street: {
+            value: street,
+            isError: errors.street,
+            statusMsg: errors.street,
+          },
+          area: {
+            value: area,
+            isError: errors.area,
+            statusMsg: errors.area,
+          },
+          state: {
+            value: stateName,
+            isError: errors.stateName,
+            statusMsg: errors.stateName,
+          },
+          pincode: {
+            value: pincode,
+            isError: errors.pincode,
+            statusMsg: errors.pincode,
+            rightLabel: cityName,
+            rightLabelPress: () => {},
+            keyboardType: 'numeric',
+            returnKeyType: 'done',
+            onSubmitEditing: this.handleNextPress,
+          },
+        }}
+        nextButtonDisabled={!isFormValid} // Disable the button if form is not valid
+        onSelectState={this.onSelectState}
+        stateName={stateName}
+        showImages={showImages}
+        errorSteps={errorSteps}
+        isNewPartner={
+          !selectedPartner || Object.keys(selectedPartner).length === 0
+        }
+        loading={isLoading}
+      />
     );
   }
 }
 
 const mapDispatchToProps = {
   setLocationDetails,
+  updatePartnerThunk,
 };
 const mapStateToProps = ({appState, partnerForm, partners}) => {
   return {
     isInternetConnected: appState.isInternetConnected,
-    isLoading: appState.loading,
+    isLoading: partners.loading,
     locationDetails: partnerForm.locationDetails,
     selectedPartner: partners.selectedPartner,
+    selectedPartnerId: partners.selectedPartnerId,
+    bankingDetails: partnerForm.bankingDetails,
+    partnerForm: partnerForm,
+    isExistingPartner: partners.isExistingPartner,
   };
 };
 export default connect(

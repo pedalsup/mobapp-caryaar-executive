@@ -6,6 +6,7 @@ import {
   SafeAreaWrapper,
   StepTracker,
   theme,
+  Loader,
 } from '@caryaar/components';
 
 const stateList = [
@@ -36,6 +37,7 @@ const Partner_Location_Form_Component = ({
   showImages = [],
   errorSteps = [],
   isNewPartner,
+  loading,
 }) => {
   const formRef = React.useRef();
   // formRef.current?.focusNext('buildingName');
@@ -67,6 +69,7 @@ const Partner_Location_Form_Component = ({
         dropdownOptions={stateList}
         stateName={stateName}
       />
+      {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );
 };

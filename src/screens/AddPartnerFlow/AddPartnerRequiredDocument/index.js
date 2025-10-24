@@ -5,7 +5,7 @@ import {ActivityIndicator, View} from 'react-native';
 import {connect} from 'react-redux';
 
 import {getScreenParam, navigate} from '../../../navigation/NavigationUtils';
-import {setDocumentDetails} from '../../../redux/actions';
+import {setDocumentDetails, updatePartnerThunk} from '../../../redux/actions';
 import {handleFileSelection} from '../../../utils/documentUtils';
 import {showToast} from '../../../utils/helper';
 import {
@@ -36,7 +36,6 @@ class AddPartnerRequiredDocument extends Component {
     const fromScreen = get(navState, 'fromScreen', false);
 
     const formattedDocs = {};
-
     if (fromScreen) {
       // Format documents from API into internal structure
       documentDetails?.forEach(doc => {
@@ -244,12 +243,16 @@ class AddPartnerRequiredDocument extends Component {
   }
 }
 
-const mapDispatchToProps = {setDocumentDetails};
+const mapDispatchToProps = {setDocumentDetails, updatePartnerThunk};
 const mapStateToProps = ({appState, partnerForm, partners}) => ({
   isInternetConnected: appState.isInternetConnected,
   isLoading: appState.loading,
   documentDetails: partnerForm?.documentDetails,
   selectedPartner: partners.selectedPartner,
+  selectedPartnerId: partners.selectedPartnerId,
+  bankingDetails: partnerForm.bankingDetails,
+  partnerForm: partnerForm,
+  isExistingPartner: partners.isExistingPartner,
 });
 
 export default connect(

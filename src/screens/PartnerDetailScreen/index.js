@@ -18,6 +18,7 @@ import {
   setBasicDetails,
   setDealershipType,
   setDocumentDetails,
+  setIsExistingPartner,
   setLocationDetails,
   setPartnerRole,
   setSellerType,
@@ -97,11 +98,13 @@ class PartnerDetailScreen extends Component {
   };
 
   onEditPartnerDetail = () => {
+    this.props.setIsExistingPartner(true);
     navigate(ScreenNames.AddPartnerBasicDetail, {
       params: {
         fromScreen: true,
         showImages: [1, 2, 3, 4],
         errorSteps: [],
+        isEdit: true,
       },
     });
   };
@@ -205,6 +208,7 @@ const mapDispatchToProps = {
   setUserType,
   setPartnerRole,
   setDocumentDetails,
+  setIsExistingPartner,
 };
 
 const mapStateToProps = ({appState, partners}) => ({

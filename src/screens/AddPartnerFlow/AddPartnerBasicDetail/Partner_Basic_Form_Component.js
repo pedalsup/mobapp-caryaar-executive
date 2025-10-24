@@ -4,6 +4,7 @@ import {
   SafeAreaWrapper,
   StepTracker,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {StyleSheet} from 'react-native';
@@ -27,6 +28,7 @@ const Partner_Basic_Form_Component = ({
   errorSteps = [],
   isNewPartner,
   onStepPress,
+  loading,
 }) => {
   return (
     <SafeAreaWrapper>
@@ -55,6 +57,7 @@ const Partner_Basic_Form_Component = ({
         onChangeEmail={onChangeEmail}
         restInputProps={restInputProps}
       />
+      {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );
 };

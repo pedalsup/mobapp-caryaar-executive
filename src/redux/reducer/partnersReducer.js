@@ -1,4 +1,5 @@
 import {types} from '../actions';
+import {SET_IS_EXISTING_PARTNER} from '../actions/actionType';
 
 const initialState = {
   loading: false,
@@ -16,6 +17,8 @@ const initialState = {
   pendingTotalPages: 0, // 1
   searchPage: 0, // 1
   searchTotalPages: 0, // 1
+  selectedPartnerId: null,
+  isExistingPartner: false,
 };
 
 const partnersReducer = (state = initialState, action) => {
@@ -59,12 +62,14 @@ const partnersReducer = (state = initialState, action) => {
       return {
         ...state,
         selectedPartner: action.payload,
+        selectedPartnerId: action.payload?.id,
         loading: false,
       };
     case types.RESET_PARTNER:
       return {
         ...state,
         selectedPartner: {},
+        selectedPartnerId: null,
         loading: false,
       };
     case types.CREATE_PARTNER_SUCCESS:
@@ -138,6 +143,10 @@ const partnersReducer = (state = initialState, action) => {
         searchTotalPages: 1,
         loading: false,
       };
+
+    case SET_IS_EXISTING_PARTNER.SUCCESS:
+      return {...state, isExistingPartner: action.payload};
+
     case types.RESET_APP_STATE:
       return initialState;
     default:
