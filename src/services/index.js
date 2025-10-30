@@ -4,3 +4,4 @@ export * from './partnerServices';
 export * from './userService';
 export * from './salesExecutiveService';
 export * from './notificationService';
+export * from './imageUploadServices';

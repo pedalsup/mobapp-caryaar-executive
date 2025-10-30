@@ -13,6 +13,7 @@ import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {goBack} from '../../../navigation/NavigationUtils';
 import {getFileType} from '../../../utils/documentUtils';
+import {DocumentGroup, FullLoader} from '../../../components';
 
 const Partner_Document_Form_Component = ({
   showImages,
@@ -25,6 +26,7 @@ const Partner_Document_Form_Component = ({
   showFilePicker,
   closeFilePicker,
   isNewPartner,
+  isLoadingDocument,
 }) => {
   const renderDocumentGroup = (title, documents) => (
     <View key={title}>
@@ -65,9 +67,24 @@ const Partner_Document_Form_Component = ({
         errorSteps={errorSteps}
       />
       <ScrollView contentContainerStyle={styles.wrapper}>
-        {renderDocumentGroup('Business Documents', businessDocuments)}
-        {renderDocumentGroup('Other Documents', otherDocuments)}
-        {renderDocumentGroup('Bank Documents', bankDocuments)}
+        <DocumentGroup
+          title={'Business Documents'}
+          documents={businessDocuments}
+          isDocument={true}
+          isView={false}
+        />
+        <DocumentGroup
+          title={'Other Documents'}
+          documents={otherDocuments}
+          isDocument={true}
+          isView={false}
+        />
+        <DocumentGroup
+          title={'Bank Documents'}
+          documents={bankDocuments}
+          isDocument={true}
+          isView={false}
+        />
         <Button label={'Next'} onPress={handleNextPress} />
       </ScrollView>
       <FilePickerModal
@@ -76,6 +93,7 @@ const Partner_Document_Form_Component = ({
         onClose={closeFilePicker}
         autoCloseOnSelect={false}
       />
+      {isLoadingDocument && <FullLoader visible={isLoadingDocument} />}
     </SafeAreaWrapper>
   );
 };

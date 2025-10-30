@@ -10,13 +10,9 @@ import {
   fetchSalesExecutivesThunk,
   removeSalesExecutive,
 } from '../../../redux/actions';
-import {
-  formatMobileNumber,
-  getErrorMessage,
-  handleFieldChange,
-  validateField,
-} from '../../../utils/helper';
+import {formatMobileNumber, getErrorMessage} from '../../../utils/helper';
 import Manage_Members_Component from './Manage_Members_Component';
+import {validateField, handleFieldChange} from '../../../utils/inputHelper';
 
 class ManageMemberScreen extends Component {
   constructor(props) {

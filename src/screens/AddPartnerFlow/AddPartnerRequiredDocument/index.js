@@ -1,84 +1,123 @@
-/* eslint-disable react-native/no-inline-styles */
 import {get} from 'lodash';
 import React, {Component} from 'react';
-import {ActivityIndicator, View} from 'react-native';
 import {connect} from 'react-redux';
 
-import {getScreenParam, navigate} from '../../../navigation/NavigationUtils';
-import {setDocumentDetails, updatePartnerThunk} from '../../../redux/actions';
-import {handleFileSelection} from '../../../utils/documentUtils';
-import {showToast} from '../../../utils/helper';
 import {
   partnerDocumentLabelMap,
   partnerDocumentType,
 } from '../../../constants/enums';
 import ScreenNames from '../../../constants/ScreenNames';
+import {getScreenParam, navigate} from '../../../navigation/NavigationUtils';
+import {setDocumentDetails, updatePartnerThunk} from '../../../redux/actions';
+import {
+  handleFileSelection,
+  transformDocumentData,
+  transformPartnerDocumentData,
+  validateRequiredDocuments,
+} from '../../../utils/documentUtils';
+import {showToast} from '../../../utils/helper';
 
-import Partner_Document_Form_Component from './Partner_Document_Form_Component';
+import strings from '../../../locales/strings';
+import {getPresignedDownloadUrl} from '../../../services';
 import {viewDocumentHelper} from '../../../utils/documentUtils';
+import {uploadDocumentViaPresignedUrl} from '../../../utils/fileUploadUtils';
+import Partner_Document_Form_Component from './Partner_Document_Form_Component';
+
+const requiredFields = ['SHOP_LICENSE', 'AADHAR_CARD_FRONT'];
+
+let partnerDocuments = [
+  partnerDocumentType.GST_REGISTRATION,
+  partnerDocumentType.SHOP_LICENSE,
+  partnerDocumentType.PAN_CARD,
+  partnerDocumentType.BANK_STATEMENT,
+  partnerDocumentType.CANCELLED_CHEQUE,
+  partnerDocumentType.BANK_STATEMENT,
+  partnerDocumentType.CANCELLED_CHEQUE,
+  partnerDocumentType.PHOTOGRAPH,
+];
 
 class AddPartnerRequiredDocument extends Component {
   constructor(props) {
     super(props);
     this.state = {
       documents: {}, // Holds selected/uploaded documents by type
-      showImages: [],
+      showImages: [1, 2],
       errorSteps: [],
       isLoadingDocument: false,
       showFilePicker: false,
       selectedDocType: null,
+      isLoading: false,
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const {route, documentDetails} = this.props;
     const navState = getScreenParam(route, 'params', null);
     const fromScreen = get(navState, 'fromScreen', false);
 
     const formattedDocs = {};
+
     if (fromScreen) {
-      // Format documents from API into internal structure
-      documentDetails?.forEach(doc => {
+      const formattedDocuments = await transformPartnerDocumentData(
+        documentDetails,
+        partnerDocuments,
+      );
+
+      let detail = await this.convertFormattedToDetails(formattedDocuments);
+      console.log({detail});
+
+      detail?.forEach(doc => {
         formattedDocs[doc.documentType] = {
           uri: doc.documentUrl,
           isLocal: false,
           type: null,
           fileSize: null,
           uploadedUrl: doc.documentUrl,
+          ...doc,
         };
+      });
+
+      console.l;
+
+      this.setState({
+        fromScreen,
+        showImages: get(navState, 'showImages', []),
+        errorSteps: get(navState, 'errorSteps', []),
       });
     }
 
     this.setState({
       fromScreen,
-      showImages: get(navState, 'showImages', []),
-      errorSteps: get(navState, 'errorSteps', []),
       documents: formattedDocs,
     });
   }
 
   handleViewImage = async uri => {
     if (!uri) {
-      return;
+      return showToast('error', strings.errorNoDocumentUpload);
     }
 
-    setTimeout(async () => {
-      this.setState({isLoadingDocument: true});
-      try {
-        await viewDocumentHelper(
-          uri,
-          imageUri => {
-            navigate(ScreenNames.ImagePreviewScreen, {uri: imageUri});
-          },
-          error => {
-            console.warn('Error opening file:', error);
-            showToast('error', 'Could not open the document.', 'bottom', 3000);
-          },
-        );
-      } finally {
-        this.setState({isLoadingDocument: false});
-      }
-    }, 50);
+    this.setState({isLoadingDocument: true});
+
+    const downloadUrlResponse = await getPresignedDownloadUrl({
+      objectKey: uri,
+    });
+
+    let downloadedUrl = downloadUrlResponse?.data?.url;
+
+    try {
+      await viewDocumentHelper(
+        downloadedUrl,
+        imageUri => {
+          navigate(ScreenNames.ImagePreviewScreen, {uri: imageUri});
+        },
+        error => {
+          showToast('error', 'Could not open the document.', 'bottom', 3000);
+        },
+      );
+    } finally {
+      this.setState({isLoadingDocument: false});
+    }
   };
 
   handleDeleteMedia = type => {
@@ -94,20 +133,39 @@ class AddPartnerRequiredDocument extends Component {
     this.setState({showFilePicker: true, selectedDocType: type});
   };
 
-  handleNextPress = () => {
-    const payload = Object.keys(this.state.documents).map(key => ({
+  handleNextPress = async () => {
+    const {documents, fromScreen, showImages, errorSteps} = this.state;
+
+    const {selectedPartnerId, isExistingPartner} = this.props;
+
+    if (!validateRequiredDocuments(documents, requiredFields)) {
+      return;
+    }
+    let payload = Object.keys(documents).map(key => ({
       documentType: key,
-      documentUrl: this.state.documents[key].uploadedUrl,
+      documentUrl: documents[key].uploadedUrl,
     }));
 
+    const navigationParams = {
+      params: {fromScreen, showImages, errorSteps},
+    };
+
+    if (!isExistingPartner) {
+      await this.props.updatePartnerThunk(
+        selectedPartnerId,
+        payload,
+        onSuccess => {
+          if (onSuccess?.success) {
+            navigate(ScreenNames.AddPartnersBankDetail, navigationParams);
+          }
+        },
+        error => {},
+      );
+      return;
+    }
+
     this.props.setDocumentDetails(payload);
-    navigate(ScreenNames.AddPartnersBankDetail, {
-      params: {
-        fromScreen: this.state.fromScreen,
-        showImages: this.state.showImages,
-        errorSteps: this.state.errorSteps,
-      },
-    });
+    navigate(ScreenNames.AddPartnersBankDetail, navigationParams);
   };
 
   closeFilePicker = () => {
@@ -115,130 +173,123 @@ class AddPartnerRequiredDocument extends Component {
   };
 
   handleFile = type => {
-    // Handles file selected from FilePickerModal
     handleFileSelection(type, async asset => {
       if (!asset?.uri) {
         return;
       }
 
-      const docObj = {
-        uri: asset.uri,
-        name: asset.fileName,
-        type: asset.type,
-        isLocal: true,
-        fileSize: asset.fileSize,
-        uploadedUrl:
-          'https://www.aeee.in/wp-content/uploads/2020/08/Sample-pdf.pdf', // mock URL for now
-      };
+      this.setState({showFilePicker: false, isLoadingDocument: true});
 
-      this.setState(prev => ({
-        documents: {
-          ...prev.documents,
-          [this.state.selectedDocType]: docObj,
-        },
-        selectedDocType: '',
-        showFilePicker: false,
-      }));
+      try {
+        const presignedKey = await uploadDocumentViaPresignedUrl(
+          asset,
+          this.state.selectedDocType,
+        );
 
-      // TODO: Upload logic placeholder, uncomment when implementing real upload
-      // try {
-      //   const formData = new FormData();
-      //   formData.append('file', {
-      //     uri: docObj.uri,
-      //     type: docObj.type,
-      //     name: docObj.name,
-      //   });
+        const {data} = await getPresignedDownloadUrl({objectKey: presignedKey});
 
-      //   const response = await uploadDocumentMultipart(formData);
-      //   const url = response?.data?.url;
+        const docObj = {
+          uri: data?.url,
+          uploadedUrl: presignedKey,
+          uploadKey: presignedKey,
+          selectedDocType: this.state.selectedAcceptedDocument,
+        };
 
-      //   if (url) {
-      //     this.setState(prev => ({
-      //       documents: {
-      //         ...prev.documents,
-      //         [type]: {
-      //           ...prev.documents[type],
-      //           uploadedUrl: url,
-      //         },
-      //       },
-      //     }));
-      //   }
-      // } catch (error) {
-      //   showApiErrorToast(error);
-      // }
+        this.setState(prev => ({
+          documents: {
+            ...prev.documents,
+            [this.state.selectedDocType]: docObj,
+          },
+          selectedDocType: '',
+          showFilePicker: false,
+        }));
+      } catch (error) {
+        console.log('error----->', JSON.stringify(error));
+        showToast('error', 'Something went wrong please try again..');
+      } finally {
+        this.setState({isLoadingDocument: false, showFilePicker: false});
+      }
     });
+  };
+
+  convertFormattedToDetails = async (formattedDocuments = {}) => {
+    const documentDetails = Object.values(formattedDocuments).map(doc => ({
+      id: doc.id,
+      partnerId: doc.partnerId,
+      documentType: doc.documentType || doc.selectedDocType,
+      documentUrl: doc.uploadedUrl || doc.uri,
+      verifiedByOps: doc.verifiedByOps ?? 'PENDING',
+      uploadedAt: doc.uploadedAt || null,
+      updatedAt: doc.updatedAt || null,
+    }));
+
+    return documentDetails;
   };
 
   render() {
     const {documents, isLoadingDocument, showFilePicker} = this.state;
-    const {selectedPartner} = this.props;
+    const {selectedPartner, isExistingPartner} = this.props;
 
     return (
-      <>
-        <Partner_Document_Form_Component
-          showImages={this.state.showImages}
-          errorSteps={this.state.errorSteps}
-          handleNextPress={this.handleNextPress}
-          businessDocuments={[
-            partnerDocumentType.GST_REGISTRATION,
-            partnerDocumentType.SHOP_LICENSE,
-            partnerDocumentType.PAN_CARD,
-          ].map(type => ({
-            type,
-            label: partnerDocumentLabelMap[type],
-            docObject: documents[type],
-            onDeletePress: () => this.handleDeleteMedia(type),
-            uploadMedia: () => this.handleUploadMedia(type),
-            viewImage: () => this.handleViewImage(documents[type]?.uri),
-          }))}
-          otherDocuments={[
-            partnerDocumentType.AADHAR_CARD_FRONT,
-            partnerDocumentType.AADHAR_CARD_BACK,
-            partnerDocumentType.PHOTOGRAPH,
-          ].map(type => ({
-            type,
-            label: partnerDocumentLabelMap[type],
-            docObject: documents[type],
-            onDeletePress: () => this.handleDeleteMedia(type),
-            uploadMedia: () => this.handleUploadMedia(type),
-            viewImage: () => this.handleViewImage(documents[type]?.uri),
-          }))}
-          bankDocuments={[
-            partnerDocumentType.BANK_STATEMENT,
-            partnerDocumentType.CANCELLED_CHEQUE,
-          ].map(type => ({
-            type,
-            label: partnerDocumentLabelMap[type],
-            docObject: documents[type],
-            onDeletePress: () => this.handleDeleteMedia(type),
-            uploadMedia: () => this.handleUploadMedia(type),
-            viewImage: () => this.handleViewImage(documents[type]?.uri),
-          }))}
-          showFilePicker={showFilePicker}
-          handleFile={this.handleFile}
-          closeFilePicker={this.closeFilePicker}
-          showDocumentLoading={isLoadingDocument}
-          isNewPartner={
-            !selectedPartner || Object.keys(selectedPartner).length === 0
-          }
-        />
-
-        {isLoadingDocument && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              height: '100%',
-              width: '100%',
-              zIndex: 999,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <ActivityIndicator size={'large'} />
-          </View>
-        )}
-      </>
+      <Partner_Document_Form_Component
+        showImages={this.state.showImages}
+        errorSteps={this.state.errorSteps}
+        handleNextPress={this.handleNextPress}
+        businessDocuments={[
+          partnerDocumentType.GST_REGISTRATION,
+          partnerDocumentType.SHOP_LICENSE,
+          partnerDocumentType.PAN_CARD,
+        ].map(type => ({
+          type,
+          label: partnerDocumentLabelMap[type],
+          docObject: documents[type],
+          onDeletePress: () => this.handleDeleteMedia(type),
+          uploadMedia: () => this.handleUploadMedia(type),
+          viewImage: () =>
+            documents[type]?.uploadedUrl || isExistingPartner
+              ? this.handleViewImage(documents[type]?.uploadedUrl)
+              : this.handleUploadMedia(type),
+          isRequired: requiredFields.includes(type),
+        }))}
+        otherDocuments={[
+          partnerDocumentType.AADHAR_CARD_FRONT,
+          partnerDocumentType.AADHAR_CARD_BACK,
+          partnerDocumentType.PHOTOGRAPH,
+        ].map(type => ({
+          type,
+          label: partnerDocumentLabelMap[type],
+          docObject: documents[type],
+          onDeletePress: () => this.handleDeleteMedia(type),
+          uploadMedia: () => this.handleUploadMedia(type),
+          viewImage: () =>
+            documents[type]?.uploadedUrl || isExistingPartner
+              ? this.handleViewImage(documents[type]?.uploadedUrl)
+              : this.handleUploadMedia(type),
+          isRequired: requiredFields.includes(type),
+        }))}
+        bankDocuments={[
+          partnerDocumentType.BANK_STATEMENT,
+          partnerDocumentType.CANCELLED_CHEQUE,
+        ].map(type => ({
+          type,
+          label: partnerDocumentLabelMap[type],
+          docObject: documents[type],
+          onDeletePress: () => this.handleDeleteMedia(type),
+          uploadMedia: () => this.handleUploadMedia(type),
+          viewImage: () =>
+            documents[type]?.uploadedUrl || isExistingPartner
+              ? this.handleViewImage(documents[type]?.uploadedUrl)
+              : this.handleUploadMedia(type),
+          isRequired: requiredFields.includes(type),
+        }))}
+        showFilePicker={showFilePicker}
+        handleFile={this.handleFile}
+        closeFilePicker={this.closeFilePicker}
+        isLoadingDocument={isLoadingDocument}
+        isNewPartner={
+          !selectedPartner || Object.keys(selectedPartner).length === 0
+        }
+      />
     );
   }
 }

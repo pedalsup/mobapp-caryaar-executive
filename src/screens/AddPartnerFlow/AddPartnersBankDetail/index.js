@@ -20,13 +20,10 @@ import {
   updatePartnerThunk,
   verifyBankByIFSCThunk,
 } from '../../../redux/actions';
-import {
-  handleFieldChange,
-  showToast,
-  validateField,
-} from '../../../utils/helper';
+import {showToast} from '../../../utils/helper';
 import {formatPartnerPayload} from '../../../utils/partnerHelpers';
 import Partner_Bank_Detail_Component from './Partner_Bank_Detail_Component';
+import {validateField, handleFieldChange} from '../../../utils/inputHelper';
 
 class AddPartnersBankDetail extends Component {
   constructor(props) {

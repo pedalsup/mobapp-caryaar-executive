@@ -9,13 +9,9 @@ import {
 import ScreenNames from '../../../constants/ScreenNames';
 import {getScreenParam, navigate} from '../../../navigation/NavigationUtils';
 import {setBasicDetails, updatePartnerThunk} from '../../../redux/actions';
-import {
-  handleFieldChange,
-  handleStepNavigation,
-  showToast,
-  validateField,
-} from '../../../utils/helper';
+import {handleStepNavigation, showToast} from '../../../utils/helper';
 import Partner_Basic_Form_Component from './Partner_Basic_Form_Component';
+import {handleFieldChange, validateField} from '../../../utils/inputHelper';
 
 class AddPartnerBasicDetail extends Component {
   constructor(props) {
@@ -106,8 +102,8 @@ class AddPartnerBasicDetail extends Component {
     let payLoad = {
       businessName,
       businessType: businessType,
-      yearInBusiness: yearsInBusiness,
-      monthlyCarSale: monthlyCarSales,
+      yearInBusiness: Number(yearsInBusiness),
+      monthlyCarSale: Number(monthlyCarSales),
       ownerName,
       ownerMobileNumber: mobileNumber,
       ownerEmail: emailAddress,
@@ -118,12 +114,11 @@ class AddPartnerBasicDetail extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
         payLoad,
         onSuccess => {
-          showToast('success', onSuccess.message);
           if (onSuccess?.success) {
             navigate(ScreenNames.AddPartnerBusinessLocation, navigationParams);
           }

@@ -249,7 +249,7 @@ class PartnersScreen extends Component {
     this.props.fetchPartnerFromId(
       partnerID,
       success => {
-        navigate(ScreenNames.AddPartnerRequiredDocument, {
+        navigate(ScreenNames.AddPartnerBasicDetail, {
           params: {
             fromScreen: true,
             showImages: [1, 2, 3, 4],

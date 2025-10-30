@@ -7,13 +7,10 @@ import {
   navigate,
 } from '../../../navigation/NavigationUtils';
 import {setLocationDetails, updatePartnerThunk} from '../../../redux/actions';
-import {
-  handleFieldChange,
-  showToast,
-  validateField,
-} from '../../../utils/helper';
+import {showToast} from '../../../utils/helper';
 import Partner_Location_Form_Component from './Partner_Location_Form_Component';
 import {get} from 'lodash';
+import {handleFieldChange, validateField} from '../../../utils/inputHelper';
 
 class AddPartnerBusinessLocation extends Component {
   constructor(props) {
@@ -39,7 +36,7 @@ class AddPartnerBusinessLocation extends Component {
       isFormValid: false,
       fromScreen: false,
       errorSteps: [],
-      showImages: [1],
+      showImages: [1, 2],
     };
   }
 
@@ -132,7 +129,7 @@ class AddPartnerBusinessLocation extends Component {
       streetAddress: street,
       area,
       state: stateName,
-      pincode,
+      pincode: Number(pincode),
       latitude: '19.076',
       longitude: '72.877',
       city: 'Mumbai',
@@ -148,7 +145,6 @@ class AddPartnerBusinessLocation extends Component {
         selectedPartnerId,
         payLoad,
         onSuccess => {
-          showToast('success', onSuccess.message);
           if (onSuccess?.success) {
             navigate(ScreenNames.AddPartnerRequiredDocument, navigationParams);
           }

@@ -10,12 +10,9 @@ import {
   handleFileSelection,
   viewDocumentHelper,
 } from '../../../utils/documentUtils';
-import {
-  handleFieldChange,
-  showToast,
-  validateField,
-} from '../../../utils/helper';
+import {showToast} from '../../../utils/helper';
 import Edit_Profile_Component from './Edit_Profile_Component';
+import {validateField, handleFieldChange} from '../../../utils/inputHelper';
 
 class EditProfileScreen extends Component {
   state = {

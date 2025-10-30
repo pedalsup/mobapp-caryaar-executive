@@ -61,7 +61,9 @@ class PartnerDetailScreen extends Component {
     this.setState({isLoading: true});
     this.props.fetchPartnerFromId(
       partnerID,
-      success => this.setState({isLoading: false}),
+      success => {
+        this.setState({isLoading: false});
+      },
       error => this.setState({isLoading: false}),
     );
   };
