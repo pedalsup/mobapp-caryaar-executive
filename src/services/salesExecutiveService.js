@@ -1,4 +1,5 @@
 import axiosInstance from '../networking/axiosInstance';
+import {endpoints} from './endpoints';
 
 /**
  * Fetches the list of all sales executives from the backend.
@@ -8,7 +9,9 @@ import axiosInstance from '../networking/axiosInstance';
  */
 export const fetchSalesExecutives = async query => {
   try {
-    const response = await axiosInstance.get(`/sales-executives/?${query}`);
+    const response = await axiosInstance.get(
+      endpoints.SALES_EXECUTIVES.LIST(query),
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -24,7 +27,9 @@ export const fetchSalesExecutives = async query => {
  */
 export const fetchSalesExecutiveById = async id => {
   try {
-    const response = await axiosInstance.get(`/sales-executives/${id}`);
+    const response = await axiosInstance.get(
+      endpoints.SALES_EXECUTIVES.BY_ID(id),
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -45,7 +50,7 @@ export const fetchSalesExecutiveById = async id => {
 export const createSalesExecutive = async salesExecutiveData => {
   try {
     const response = await axiosInstance.post(
-      '/sales-executives',
+      endpoints.SALES_EXECUTIVES.CREATE,
       salesExecutiveData,
     );
     return response.data;
@@ -63,7 +68,9 @@ export const createSalesExecutive = async salesExecutiveData => {
  */
 export const deleteSalesExecutiveById = async id => {
   try {
-    const response = await axiosInstance.delete(`/sales-executives/${id}`);
+    const response = await axiosInstance.delete(
+      endpoints.SALES_EXECUTIVES.DELETE(id),
+    );
     return response.data;
   } catch (error) {
     throw error;

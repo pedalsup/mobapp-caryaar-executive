@@ -1,4 +1,5 @@
 import axiosInstance from '../networking/axiosInstance';
+import {endpoints} from './endpoints';
 
 /**
  * Fetches partners filtered by onboarding status, with pagination.
@@ -13,7 +14,7 @@ import axiosInstance from '../networking/axiosInstance';
  */
 export const fetchPartnersByStatus = async (status, page = 1, limit = 10) => {
   try {
-    const response = await axiosInstance.get('/partners', {
+    const response = await axiosInstance.get(endpoints.PARTNERS.LIST, {
       params: {onboardingStatus: status, page, limit},
     });
     return response.data;
@@ -33,7 +34,9 @@ export const fetchPartnersByStatus = async (status, page = 1, limit = 10) => {
  */
 export const fetchPartnerById = async partnerId => {
   try {
-    const response = await axiosInstance.get(`/partners/${partnerId}`);
+    const response = await axiosInstance.get(
+      endpoints.PARTNERS.BY_ID(partnerId),
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -63,7 +66,7 @@ export const searchPartnersByKeyword = async (
     if (status) {
       params.onboardingStatus = status;
     }
-    const response = await axiosInstance.get('/partners', {params});
+    const response = await axiosInstance.get(endpoints.PARTNERS.LIST, {params});
     return response.data;
   } catch (error) {
     throw error;
@@ -81,7 +84,10 @@ export const searchPartnersByKeyword = async (
  */
 export const createPartner = async partnerData => {
   try {
-    const response = await axiosInstance.post('/partners', partnerData);
+    const response = await axiosInstance.post(
+      endpoints.PARTNERS.LIST,
+      partnerData,
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -101,7 +107,7 @@ export const createPartner = async partnerData => {
 export const updatePartnerById = async (partnerData, partnerId) => {
   try {
     const response = await axiosInstance.put(
-      `/partners/${partnerId}`,
+      endpoints.PARTNERS.BY_ID(partnerId),
       partnerData,
     );
     return response.data;
@@ -120,9 +126,7 @@ export const updatePartnerById = async (partnerData, partnerId) => {
  */
 export const fetchPartnerPerformances = async () => {
   try {
-    const response = await axiosInstance.get(
-      '/partners/get-partner-performances',
-    );
+    const response = await axiosInstance.get(endpoints.PARTNERS.PERFORMANCE);
     return response.data;
   } catch (error) {
     throw error;
@@ -139,7 +143,7 @@ export const fetchPartnerPerformances = async () => {
  */
 export const fetchPartnerStats = async () => {
   try {
-    const response = await axiosInstance.get('/partners/stats');
+    const response = await axiosInstance.get(endpoints.PARTNERS.STATS);
     return response.data;
   } catch (error) {
     throw error;

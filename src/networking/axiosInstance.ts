@@ -6,7 +6,7 @@ import {logoutUser, setLogoutUser} from '../redux/actions';
 
 const axiosInstance = axios.create({
   // baseURL: 'https://caryaar.onrender.com/api/v1',
-  baseURL: 'https://caryaar-dev-api.pedalsupclients.xyz/api/v1',
+  baseURL: 'https://caryaar-dev-api.pedalsupclients.xyz/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

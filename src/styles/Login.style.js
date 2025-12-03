@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import theme from '../theme';
+import {theme} from '@caryaar/components';
 
 export const styles = StyleSheet.create({
   wrapper: {
@@ -22,6 +22,8 @@ export const styles = StyleSheet.create({
     fontFamily: theme.typography.fonts.hankenGroteskBold,
     fontWeight: theme.typography.fontWeights.bold,
     textAlign: 'center',
+    flex: 1,
+    paddingVertical: 0,
   },
   labelIcon: {
     height: theme.sizes.icons.smd,

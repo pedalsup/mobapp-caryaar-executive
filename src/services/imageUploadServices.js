@@ -1,4 +1,6 @@
 import axiosInstance from '../networking/axiosInstance';
+import axios from 'axios';
+import {endpoints} from './endpoints';
 
 /**
  * Fetches a presigned upload URL for uploading a file.
@@ -11,7 +13,10 @@ import axiosInstance from '../networking/axiosInstance';
  */
 export const getPresignedUploadUrl = async payload => {
   try {
-    const response = await axiosInstance.post('/presigned/upload-url', payload);
+    const response = await axiosInstance.post(
+      endpoints.UPLOAD.PRESIGNED_UPLOAD,
+      payload,
+    );
     return response.data; // usually includes `url` and maybe `key`
   } catch (error) {
     throw error;
@@ -30,7 +35,7 @@ export const getPresignedUploadUrl = async payload => {
 export const getPresignedDownloadUrl = async payload => {
   try {
     const response = await axiosInstance.post(
-      '/presigned/download-url',
+      endpoints.UPLOAD.PRESIGNED_DOWNLOAD,
       payload,
     );
     return response.data; // usually includes `url`
@@ -38,8 +43,6 @@ export const getPresignedDownloadUrl = async payload => {
     throw error;
   }
 };
-
-import axios from 'axios';
 
 /**
  * Uploads a file to a presigned S3 URL.
@@ -70,11 +73,15 @@ export const uploadFileToPresignedUrl = async (
 
 export const uploadFileWithFormData = async formData => {
   try {
-    const response = await axiosInstance.post('/upload/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const response = await axiosInstance.post(
+      endpoints.UPLOAD.FORM_UPLOAD,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
+    );
 
     return response.data;
   } catch (error) {

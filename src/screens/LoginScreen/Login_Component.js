@@ -23,6 +23,8 @@ const Login_Component = ({
   generateOTP,
   isError,
 }) => {
+  const [caretHidden, setCaretHidden] = React.useState(false);
+
   return (
     <SafeAreaWrapper
       barStyle="dark-content"
@@ -68,11 +70,14 @@ const Login_Component = ({
                 </Text>
               </View>
               <Input
-                placeholder="98744 32092"
+                // placeholder="98744 32092"
                 optionalLabelContainerStyles={{alignSelf: 'center'}}
                 inputStyles={styles.inputStyle}
                 value={mobileNumber}
-                onChangeText={setMobileNumber}
+                onChangeText={value => {
+                  setMobileNumber?.(value);
+                  setCaretHidden(!(value.length > 0));
+                }}
                 maxLength={10}
                 keyboardType="number-pad"
                 isError={isError}

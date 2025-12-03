@@ -1,4 +1,5 @@
 import axiosInstance from '../networking/axiosInstance';
+import {endpoints} from './endpoints';
 
 /**
  * Fetches all notifications.
@@ -10,7 +11,7 @@ import axiosInstance from '../networking/axiosInstance';
  */
 export const fetchNotifications = async () => {
   try {
-    const response = await axiosInstance.get('/notifications');
+    const response = await axiosInstance.get(endpoints.NOTIFICATIONS.LIST);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch notifications', error);
@@ -28,7 +29,9 @@ export const fetchNotifications = async () => {
  */
 export const markAllNotificationsRead = async () => {
   try {
-    const response = await axiosInstance.patch('/notifications/read-all');
+    const response = await axiosInstance.patch(
+      endpoints.NOTIFICATIONS.READ_ALL,
+    );
     return response.data;
   } catch (error) {
     console.error('Failed to mark notifications as read', error);

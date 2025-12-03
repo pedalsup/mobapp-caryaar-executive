@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import theme from '../theme';
+import {theme} from '@caryaar/components';
 
 export const styles = StyleSheet.create({
   container: {flex: 1, padding: 16, backgroundColor: '#fff'},

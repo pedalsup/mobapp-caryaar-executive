@@ -5,3 +5,4 @@ export * from './userService';
 export * from './salesExecutiveService';
 export * from './notificationService';
 export * from './imageUploadServices';
+export * from './endpoints';

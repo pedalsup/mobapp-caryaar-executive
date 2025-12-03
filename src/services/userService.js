@@ -1,4 +1,5 @@
 import axiosInstance from '../networking/axiosInstance';
+import {endpoints} from './endpoints';
 
 /**
  * Logs in a user based on type (e.g., admin, partner, customer).
@@ -13,7 +14,7 @@ import axiosInstance from '../networking/axiosInstance';
 export const loginWithType = async (type, payload) => {
   try {
     const response = await axiosInstance.post(
-      `/user/login?type=${encodeURIComponent(type)}`,
+      endpoints.USER.LOGIN(type),
       payload,
       {
         skipAuth: true,
@@ -37,7 +38,10 @@ export const loginWithType = async (type, payload) => {
  */
 export const updateUserProfile = async payload => {
   try {
-    const response = await axiosInstance.put('/user/update-profile', payload);
+    const response = await axiosInstance.put(
+      endpoints.USER.UPDATE_PROFILE,
+      payload,
+    );
     return response.data;
   } catch (error) {
     console.error('Update profile failed:', error);
@@ -56,7 +60,10 @@ export const updateUserProfile = async payload => {
  */
 export const changeUserPassword = async payload => {
   try {
-    const response = await axiosInstance.post('/user/change-password', payload);
+    const response = await axiosInstance.post(
+      endpoints.USER.CHANGE_PASSWORD,
+      payload,
+    );
     return response.data;
   } catch (error) {
     console.error('Change password failed:', error);
@@ -73,7 +80,7 @@ export const changeUserPassword = async payload => {
  */
 export const getUserProfile = async payload => {
   try {
-    const response = await axiosInstance.get('/user/profile', payload);
+    const response = await axiosInstance.get(endpoints.USER.PROFILE, payload);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch user profile:', error);

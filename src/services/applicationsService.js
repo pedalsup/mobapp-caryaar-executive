@@ -1,4 +1,5 @@
 import axiosInstance from '../networking/axiosInstance';
+import {endpoints} from './endpoints';
 
 /**
  * Fetches all loan applications.
@@ -10,7 +11,7 @@ import axiosInstance from '../networking/axiosInstance';
  */
 export const fetchLoanApplications = async (page = 1, limit = 10) => {
   try {
-    const response = await axiosInstance.get('/loan-applications/', {
+    const response = await axiosInstance.get(endpoints.LOAN_APPLICATION.LIST, {
       params: {page, limit},
     });
     return response.data;
@@ -31,7 +32,9 @@ export const fetchLoanApplications = async (page = 1, limit = 10) => {
  */
 export const fetchLoanApplicationById = async id => {
   try {
-    const response = await axiosInstance.get(`/loan-applications/${id}`);
+    const response = await axiosInstance.get(
+      endpoints.LOAN_APPLICATION.BY_ID(id),
+    );
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch loan application with ID ${id}:`, error);
@@ -62,7 +65,9 @@ export const searchLoanApplicationByKeyword = async (
     if (status) {
       params.onboardingStatus = status;
     }
-    const response = await axiosInstance.get('/loan-applications', {params});
+    const response = await axiosInstance.get(endpoints.LOAN_APPLICATION.LIST, {
+      params,
+    });
     return response.data;
   } catch (error) {
     throw error;

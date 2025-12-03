@@ -4,9 +4,9 @@
     "Amiko",
     "archivo",
     "Archivo",
+    "Digilocker",
     "evm",
     "Hypothecation",
-    "ifsc",
     "trx",
     "Unfollow"
   ],
@@ -16,6 +16,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
+  "javascript.validate.enable": false,
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false
@@ -26,7 +27,5 @@
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  },
-  "javascript.implicitProjectConfig.checkJs": true,
-  "javascript.validate.enable": true
+  }
 }
