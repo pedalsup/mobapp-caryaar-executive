@@ -1,19 +1,16 @@
 import {
   Button,
+  DocumentGroup,
   FilePickerModal,
+  FullLoader,
   Header,
   SafeAreaWrapper,
-  Spacing,
   StepTracker,
-  Text,
   theme,
-  VehicleImageCard,
 } from '@caryaar/components';
 import React from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import {goBack} from '../../../navigation/NavigationUtils';
-import {getFileType} from '../../../utils/documentUtils';
-import {DocumentGroup, FullLoader} from '../../../components';
 
 const Partner_Document_Form_Component = ({
   showImages,
@@ -28,33 +25,6 @@ const Partner_Document_Form_Component = ({
   isNewPartner,
   isLoadingDocument,
 }) => {
-  const renderDocumentGroup = (title, documents) => (
-    <View key={title}>
-      <Text>{title}</Text>
-      <View style={styles.rowSpaceBetween}>
-        {documents.map(doc => {
-          const fileUri = doc?.docObject?.uri;
-          const fileType = getFileType(fileUri);
-          return (
-            <View key={`${title}-${doc.label}`} style={styles.halfWidth}>
-              <VehicleImageCard
-                label={doc.label}
-                image={fileUri}
-                onDeletePress={doc.onDeletePress}
-                viewImage={doc.viewImage}
-                btnLabel={'Click to Upload\nImage or PDF'}
-                uploadMedia={doc.uploadMedia}
-                fileType={fileType}
-                // isDocument={fileType !== 'image'}
-              />
-            </View>
-          );
-        })}
-      </View>
-      <Spacing size="lg" />
-    </View>
-  );
-
   return (
     <SafeAreaWrapper>
       <Header

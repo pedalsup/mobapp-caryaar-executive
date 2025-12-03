@@ -10,11 +10,11 @@ import {
   Text,
   TextAreaInput,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
-import {Loader} from '../../components';
 import {getApplicationStatusLabel} from '../../constants/enums';
 import {getGradientColors} from '../../utils/helper';
 import DocumentList from './DocumentList';

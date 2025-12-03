@@ -7,10 +7,12 @@ import {
   SafeAreaWrapper,
   Spacing,
   theme,
+  Loader,
+  PaginationFooter,
 } from '@caryaar/components';
 import React from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {Loader, NoDataFound, PaginationFooter} from '../../components';
+import {NoDataFound} from '../../components';
 import {getApplicationStatusLabel} from '../../constants/enums';
 import {formatDate, getGradientColors} from '../../utils/helper';
 
@@ -105,7 +107,7 @@ const Applications_Component = ({
             loading={loading}
             currentPage={currentPage}
             totalPages={totalPages}
-            footerMessage={'All applications loaded.'}
+            footerMessage={'You’ve reached the end!'}
           />
         }
       />

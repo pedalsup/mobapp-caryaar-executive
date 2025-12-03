@@ -1,8 +1,7 @@
-import {images} from '@caryaar/components';
+import {images, Loader} from '@caryaar/components';
 import {get} from 'lodash';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../components';
 import {businessTypeValue, getLabelFromEnum} from '../../constants/enums';
 import ScreenNames from '../../constants/ScreenNames';
 import {

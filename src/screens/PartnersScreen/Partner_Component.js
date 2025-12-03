@@ -7,10 +7,12 @@ import {
   Text,
   images,
   theme,
+  Loader,
+  PaginationFooter,
 } from '@caryaar/components';
 import React, {useEffect, useState} from 'react';
 import {FlatList, Pressable, StyleSheet, View} from 'react-native';
-import {Loader, NoDataFound, PaginationFooter} from '../../components';
+import {NoDataFound} from '../../components';
 import {partnerDocumentLabelMap} from '../../constants/enums';
 import {
   formatDate,
@@ -170,7 +172,7 @@ const Partner_Component = ({
             loading={loading}
             currentPage={currentPage}
             totalPages={totalPages}
-            footerMessage={'All Partners are loaded.'}
+            footerMessage={'You’ve reached the end!'}
             minTotalPagesToShowMessage={1}
           />
         }

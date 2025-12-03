@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 import {Alert} from 'react-native';
 import {connect} from 'react-redux';
-import {Loader} from '../../../components';
 import {salesExecOptions} from '../../../constants/enums';
 import {
   createSalesExecutiveThunk,

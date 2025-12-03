@@ -11,6 +11,8 @@ import {
   Text,
   theme,
   Dropdown,
+  Loader,
+  PaginationFooter,
 } from '@caryaar/components';
 import React from 'react';
 import {
@@ -20,12 +22,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {
-  InitialsAvatar,
-  Loader,
-  NoDataFound,
-  PaginationFooter,
-} from '../../../components';
+import {InitialsAvatar, NoDataFound} from '../../../components';
 import {getLabelFromEnum, salesExecutiveValue} from '../../../constants/enums';
 import {goBack} from '../../../navigation/NavigationUtils';
 import {formatMobileNumber} from '../../../utils/helper';
@@ -124,7 +121,7 @@ const Manage_Members_Component = ({
             loading={isLoading}
             currentPage={currentPage}
             totalPages={totalPages}
-            footerMessage={'All members loaded.'}
+            footerMessage={'You’ve reached the end!'}
           />
         }
       />

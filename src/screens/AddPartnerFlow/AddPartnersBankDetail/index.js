@@ -1,8 +1,7 @@
-import {theme} from '@caryaar/components';
+import {theme, Loader} from '@caryaar/components';
 import {get} from 'lodash';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../../components';
 import {
   settlementPreference,
   settlementPreferenceOptions,

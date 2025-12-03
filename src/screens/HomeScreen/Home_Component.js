@@ -9,10 +9,11 @@ import {
   Spacing,
   Text,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {FlatList, Image, View} from 'react-native';
-import {InitialsAvatar, Loader, NoDataFound} from '../../components';
+import {InitialsAvatar, NoDataFound} from '../../components';
 import ScreenNames from '../../constants/ScreenNames';
 import {navigateToTab} from '../../navigation/NavigationUtils';
 import {styles} from '../../styles/Home.style';

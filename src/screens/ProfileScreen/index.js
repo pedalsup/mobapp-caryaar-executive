@@ -1,25 +1,17 @@
+import {Loader} from '@caryaar/components';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../components';
-import {
-  getLabelFromEnum,
-  partnerUserPositionValue,
-  salesExecutiveValue,
-} from '../../constants/enums';
+import {getLabelFromEnum, salesExecutiveValue} from '../../constants/enums';
 import ScreenNames from '../../constants/ScreenNames';
-import {
-  navigate,
-  navigateAndSimpleReset,
-} from '../../navigation/NavigationUtils';
+import {navigate} from '../../navigation/NavigationUtils';
 import {
   fetchUser,
+  logoutUser,
   resetAppState,
   resetSalesExecutive,
   setLoginStatus,
-  logoutUser,
 } from '../../redux/actions';
 import {removeCountryCode} from '../../utils/helper';
-import {clearLoginStatus} from '../../utils/storage';
 import Profile_Component from './Profile_Component';
 
 class ProfileScreen extends Component {
