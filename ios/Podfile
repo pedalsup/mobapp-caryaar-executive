@@ -44,7 +44,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'mobapp_caryaar_executive' do
+target 'CarYaarExecutive' do
   config = use_native_modules!
 
   use_react_native!(

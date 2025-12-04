@@ -1,4 +1,4 @@
-package com.mobapp_caryaar_executive
+package com.caryaar.executive
 
 import android.app.Application
 import com.facebook.react.PackageList

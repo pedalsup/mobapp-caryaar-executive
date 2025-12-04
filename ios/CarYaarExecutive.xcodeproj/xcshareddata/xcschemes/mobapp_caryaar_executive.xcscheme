@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "mobapp_caryaar_executive.app"
-               BlueprintName = "mobapp_caryaar_executive"
-               ReferencedContainer = "container:mobapp_caryaar_executive.xcodeproj">
+               BuildableName = "CarYaarExecutive.app"
+               BlueprintName = "CarYaarExecutive"
+               ReferencedContainer = "container:CarYaarExecutive.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "mobapp_caryaar_executiveTests.xctest"
-               BlueprintName = "mobapp_caryaar_executiveTests"
-               ReferencedContainer = "container:mobapp_caryaar_executive.xcodeproj">
+               BuildableName = "CarYaarExecutiveTests.xctest"
+               BlueprintName = "CarYaarExecutiveTests"
+               ReferencedContainer = "container:CarYaarExecutive.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "mobapp_caryaar_executive.app"
-            BlueprintName = "mobapp_caryaar_executive"
-            ReferencedContainer = "container:mobapp_caryaar_executive.xcodeproj">
+            BuildableName = "CarYaarExecutive.app"
+            BlueprintName = "CarYaarExecutive"
+            ReferencedContainer = "container:CarYaarExecutive.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "mobapp_caryaar_executive.app"
-            BlueprintName = "mobapp_caryaar_executive"
-            ReferencedContainer = "container:mobapp_caryaar_executive.xcodeproj">
+            BuildableName = "CarYaarExecutive.app"
+            BlueprintName = "CarYaarExecutive"
+            ReferencedContainer = "container:CarYaarExecutive.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
