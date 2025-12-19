@@ -5,15 +5,13 @@ import {DOCUMENT_LABELS, KYC_LABELS} from '../../constants/enums';
 
 const DocumentList = ({
   isLoading,
-  loanDocuments,
   kycDocuments,
   onDocumentPress,
   documentType,
+  loanDocumentList,
 }) => {
   const safeKycDocs =
     kycDocuments && typeof kycDocuments === 'object' ? kycDocuments : {};
-  const safeLoanDocs =
-    loanDocuments && typeof loanDocuments === 'object' ? loanDocuments : {};
 
   return (
     <>
@@ -49,22 +47,25 @@ const DocumentList = ({
         Loan Documents
       </Text>
       <Spacing size="sm" />
-      {Object.entries(DOCUMENT_LABELS).map(([key, label]) => {
-        const hasDocument = safeLoanDocs[key];
+
+      {loanDocumentList?.map((item, index) => {
+        const {type, label, docObject} = item;
+        const hasDocument = !!docObject;
+        const isLastItem = index === loanDocumentList.length - 1;
 
         return (
-          <React.Fragment key={key}>
+          <React.Fragment key={type}>
             <DocumentRow
               label={label}
               actionLabel={hasDocument ? 'View' : 'Request Documents'}
-              isLoading={isLoading && documentType === key}
+              isLoading={isLoading && documentType === type}
               disabled={isLoading}
               onPress={() => {
-                onDocumentPress?.(key, safeLoanDocs?.[key], hasDocument);
+                onDocumentPress?.(type, docObject?.uri, hasDocument);
               }}
               showError={!hasDocument}
             />
-            <Spacing size="smd" />
+            <Spacing size={isLastItem ? 0 : 'smd'} />
           </React.Fragment>
         );
       })}
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#E0E0E0',
-    marginVertical: theme.sizes.spacing.smd,
+    marginBottom: theme.sizes.spacing.smd,
   },
 });
 

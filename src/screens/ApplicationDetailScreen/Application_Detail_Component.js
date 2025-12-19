@@ -38,13 +38,13 @@ const Application_Detail_Component = ({
   submittedOn,
   processingTime,
   lastUpdatedOn,
-  loanDocuments,
   kycDocuments,
   onDocumentPress,
   documentType,
   additionalNotes,
   contactCustomer,
   contactPartner,
+  documentList,
 }) => {
   return (
     <SafeAreaWrapper backgroundColor={theme.colors.background}>
@@ -83,18 +83,11 @@ const Application_Detail_Component = ({
           <Spacing size="lg" />
           <DetailInfoCard label={'Documents'} isSemiBold={false}>
             <DocumentList
-              viewPanCard={viewPanCard}
               isLoading={isLoading}
               documentType={documentType}
-              // kycDocuments={kycDocuments} // TODO remove this comment and delete kycDocuments object
-              kycDocuments={{
-                aadharFrontPhoto:
-                  'https://www.aeee.in/wp-content/uploads/2020/08/Sample-pdf.pdf',
-                aadharBackphoto: 'https://picsum.photos/200/300',
-                pancardPhoto: '',
-              }}
-              loanDocuments={loanDocuments}
+              kycDocuments={kycDocuments}
               onDocumentPress={onDocumentPress}
+              loanDocumentList={documentList}
             />
           </DetailInfoCard>
           <Spacing size="lg" />

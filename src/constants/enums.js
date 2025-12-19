@@ -346,16 +346,17 @@ export const currentLoanOptions = Object.freeze({
   no: 'no',
 });
 
-export const loanType = Object.freeze({
-  purchase: 1,
-  refinance: 2,
-  topUp: 3,
-  internalBT: 4,
-  externalBT: 5,
-  loan: 6,
+export const loanType = {
+  addVehicle: 9,
+  externalBT: 'EXTERNAL_BALANCE_TRANSFER',
+  internalBT: 'INTERNAL_BALACE_TRANSFER',
   lease: 7,
+  loan: 6,
+  purchase: 'OLD_CAR_SALE_PURCHASE',
+  refinance: 'REFINANCE',
   subscribe: 8,
-});
+  topUp: 'TOP_UP',
+};
 
 export const eVehicleStatus = Object.freeze({
   INVENTORY: 'inventory',
@@ -435,6 +436,48 @@ export const DOCUMENT_LABELS = {
   // passportImage: 'Passport',
 };
 
+export const documentImageType = Object.freeze({
+  ID_PROOF: 'idProofImage',
+  ADDRESS_PROOF: 'addressProofImage',
+  PERMANENT_ADDRESS: 'permanentAddressImage',
+  INCOME_PROOF: 'incomeProofImage',
+  BANKING_PROOF: 'bankingProofImage',
+  BUSINESS_PROOF: 'businessProofImage',
+  INSURANCE: 'insuranceImage',
+  APPLICATION_FORM: 'applicationFormImage',
+  CO_APPLICANT: 'coapplicantImage',
+  PASSPORT: 'passportImage',
+  OTHER_DOCUMENTS: 'otherDocuments',
+  SOA: 'soa',
+  SANCTION_LETTER: 'sanctionLetter',
+  NOC: 'noc',
+  FORM_34: 'form34',
+  PASSPORT_SIZE_PHOTO: 'passportImage',
+  CO_APPLICANT_DOCUMENTS: 'coapplicantImage',
+  SPECIAL_DOCUMENTS: 'specialDocuments',
+});
+
+export const documentImageLabelMap = {
+  [documentImageType.ADDRESS_PROOF]: 'Address Proof',
+  [documentImageType.APPLICATION_FORM]: 'Application Form',
+  [documentImageType.BANKING_PROOF]: 'Banking Proof',
+  [documentImageType.BUSINESS_PROOF]: 'Business Proof',
+  [documentImageType.CO_APPLICANT]: 'Co-applicant Image',
+  [documentImageType.FORM_34]: 'Form 34',
+  [documentImageType.ID_PROOF]: 'ID Proof',
+  [documentImageType.INCOME_PROOF]: 'Income Proof',
+  [documentImageType.INSURANCE]: 'Insurance',
+  [documentImageType.NOC]: 'NOC',
+  [documentImageType.OTHER_DOCUMENTS]: 'Other Document',
+  [documentImageType.PASSPORT]: 'Passport',
+  [documentImageType.PERMANENT_ADDRESS]: 'Permanent Address',
+  [documentImageType.SANCTION_LETTER]: 'Sanction Letter',
+  [documentImageType.SOA]: 'Form24 or SOA',
+  [documentImageType.PASSPORT_SIZE_PHOTO]: 'Passport Image',
+  [documentImageType.CO_APPLICANT_DOCUMENTS]: 'Co-applicant Image',
+  [documentImageType.SPECIAL_DOCUMENTS]: 'Special Documents',
+};
+
 export const KYC_LABELS = {
   pancardPhoto: 'PAN Card',
   aadharFrontPhoto: 'Aadhar Card Front',
@@ -446,3 +489,34 @@ export const API_TRIGGER = {
   LOAD_MORE: 'loadMore',
   PULL_TO_REFRESH: 'pullToRefresh',
 };
+
+export const occupationType = Object.freeze({
+  SALARIED: 'SALARIED',
+  SELF_EMPLOYED: 'SELF_EMPLOYED',
+  SELF_EMPLOYED_PROFESSIONAL: 'SELF_EMPLOYED_PROFESSIONAL',
+  AGRICULTURE: 'AGRICULTURE',
+  OTHER: 'OTHER',
+});
+
+export const occupationLabelMap = {
+  [occupationType.SALARIED]: 'Salaried',
+  [occupationType.SELF_EMPLOYED]: 'Self-Employed',
+  [occupationType.SELF_EMPLOYED_PROFESSIONAL]: 'Self-Employed Professional',
+  [occupationType.AGRICULTURE]: 'Agriculture',
+  [occupationType.OTHER]: 'Other',
+};
+
+export const documentType = Object.freeze({
+  [documentImageType.ID_PROOF]: 'idProofType',
+  [documentImageType.ADDRESS_PROOF]: 'addressProofType',
+  [documentImageType.PERMANENT_ADDRESS]: 'permanentAddressType',
+  [documentImageType.INCOME_PROOF]: 'incomeProofType',
+  [documentImageType.BANKING_PROOF]: 'bankingProofType',
+  [documentImageType.BUSINESS_PROOF]: 'businessProofType',
+  [documentImageType.INSURANCE]: 'insuranceProofType',
+  [documentImageType.OTHER_DOCUMENTS]: 'otherDocumentsType',
+  [documentImageType.FORM_34]: 'form34DocumentType',
+  [documentImageType.SOA]: 'soaDocumentType',
+  [documentImageType.SANCTION_LETTER]: 'sanctionLetterType',
+  [documentImageType.NOC]: 'nocDocumentType',
+});

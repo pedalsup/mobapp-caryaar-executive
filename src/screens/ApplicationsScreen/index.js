@@ -55,10 +55,6 @@ class ApplicationsScreen extends Component {
       });
   };
 
-  resetApiTrigger = () => {
-    this.setState({apiTrigger: 'default'});
-  };
-
   pullToRefresh = async () => {
     this.setState({
       refreshing: true,
@@ -118,7 +114,6 @@ class ApplicationsScreen extends Component {
   };
 
   onPressPrimaryButton = value => {
-    // TODO Handle filter logic here if needed
     this.setState(
       {
         showFilterApplications: false,
@@ -240,7 +235,7 @@ class ApplicationsScreen extends Component {
         refreshing={refreshing}
         onRefresh={this.pullToRefresh}
         onEndReached={this.handleLoadMore}
-        loadingMore={apiTrigger === 'loadMore' && loading}
+        loadingMore={apiTrigger === API_TRIGGER.LOAD_MORE}
         onSearchText={this.onSearchText}
         searchText={searchText}
         clearSearch={this.clearSearch}
