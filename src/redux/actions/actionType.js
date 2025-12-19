@@ -14,3 +14,10 @@ export const createAsyncActionTypes = base => ({
 export const SET_IS_EXISTING_PARTNER = createAsyncActionTypes(
   'SET_IS_EXISTING_PARTNER',
 );
+
+export const RESET_LOAN_APPLICATION = createAsyncActionTypes(
+  'RESET_LOAN_APPLICATION',
+);
+export const SET_LOAN_FILTER_VALUE = createAsyncActionTypes(
+  'SET_LOAN_FILTER_VALUE',
+);

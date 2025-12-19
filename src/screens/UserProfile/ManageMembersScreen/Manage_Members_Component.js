@@ -22,10 +22,15 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {InitialsAvatar, NoDataFound} from '../../../components';
+import {
+  DeleteConfirmationContent,
+  InitialsAvatar,
+  NoDataFound,
+} from '../../../components';
 import {getLabelFromEnum, salesExecutiveValue} from '../../../constants/enums';
 import {goBack} from '../../../navigation/NavigationUtils';
 import {formatMobileNumber} from '../../../utils/helper';
+import strings from '../../../locales/strings';
 
 const Manage_Members_Component = ({
   handleAddNewMemberPress,
@@ -51,6 +56,7 @@ const Manage_Members_Component = ({
   currentPage,
   totalPages,
   loadingMore,
+  deleteModalProp,
 }) => {
   const [showDropdown, setShowDropdown] = React.useState(false);
 
@@ -87,7 +93,9 @@ const Manage_Members_Component = ({
             {formatMobileNumber(item?.user?.mobileNumber)}
           </Text>
         </View>
-        <Pressable onPress={() => handleDeleteMemberPress?.(item, index)}>
+        <Pressable
+          onPress={() => handleDeleteMemberPress?.(item, index)}
+          hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
           <Image source={images.icon_delete} style={styles.deleteIcon} />
         </Pressable>
       </Card>
@@ -196,6 +204,16 @@ const Manage_Members_Component = ({
       <View style={styles.buttonWrapper}>
         <Button label={'Add New Member'} onPress={handleAddNewMemberPress} />
       </View>
+
+      <DeleteConfirmationContent
+        isVisible={deleteModalProp?.isDeleteModalVisible}
+        onModalHide={deleteModalProp?.onModalHide}
+        onPressPrimaryButtonPress={deleteModalProp?.onDeleteMemberConfirm}
+        title={strings.deleteMember}
+        message={strings.deleteMemberConfirmationMessage}
+        isLoading={deleteModalProp?.loading}
+      />
+
       {isLoading && <Loader visible={isLoading} />}
     </SafeAreaWrapper>
   );

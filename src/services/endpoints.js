@@ -41,4 +41,8 @@ export const endpoints = {
     CHANGE_PASSWORD: '/v1/user/change-password',
     PROFILE: '/v1/user/profile',
   },
+  LOAN: {
+    TRACKING: applicationId =>
+      `/v1/loan-applications/tracking/${applicationId}`,
+  },
 };

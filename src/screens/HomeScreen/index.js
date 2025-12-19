@@ -56,17 +56,15 @@ class HomeScreen extends Component {
     const {partnerPerformances, loading, partnerStats} = this.props;
     const {refreshing} = this.state;
     return (
-      <>
-        <Home_Component
-          onRightIconPress={this.onRightIconPress}
-          onAddPartner={this.onAddPartner}
-          partnerPerformances={partnerPerformances}
-          loading={loading && !refreshing}
-          onRefresh={this.onRefresh}
-          refreshing={refreshing}
-          partnerStats={partnerStats}
-        />
-      </>
+      <Home_Component
+        onRightIconPress={this.onRightIconPress}
+        onAddPartner={this.onAddPartner}
+        partnerPerformances={partnerPerformances}
+        loading={loading && !refreshing}
+        onRefresh={this.onRefresh}
+        refreshing={refreshing}
+        partnerStats={partnerStats}
+      />
     );
   }
 }

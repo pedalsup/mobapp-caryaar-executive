@@ -4,6 +4,7 @@ import {
   searchLoanApplicationByKeyword,
 } from '../../services';
 import {showApiErrorToast} from '../../utils/helper';
+import {RESET_LOAN_APPLICATION, SET_LOAN_FILTER_VALUE} from './actionType';
 import types from './types';
 
 /**
@@ -18,6 +19,7 @@ import types from './types';
 export const fetchLoanApplicationsThunk = (
   page = 1,
   limit = 10,
+  payload = {},
   onSuccess,
   onFailure,
 ) => {
@@ -25,13 +27,16 @@ export const fetchLoanApplicationsThunk = (
     dispatch({type: types.FETCH_LOAN_APPLICATIONS_REQUEST});
 
     try {
-      const response = await fetchLoanApplications(page, limit);
+      const response = await fetchLoanApplications(page, limit, payload);
+      const isSearch = payload?.params?.search;
+      const applications = response.data || [];
+
       dispatch({
         type: types.FETCH_LOAN_APPLICATIONS_SUCCESS,
         payload: {
-          data: response.data,
-          page: response.pagination.page,
-          totalPages: response.pagination.totalPages,
+          applications,
+          pagination: response.pagination,
+          isSearch,
         },
       });
       onSuccess?.(response);
@@ -137,4 +142,13 @@ export const searchLoanApplicationThunk = (
  */
 export const clearLoanSearch = () => ({
   type: types.CLEAR_LOAN_SEARCH,
+});
+
+export const resetLoanApplication = () => ({
+  type: RESET_LOAN_APPLICATION.SUCCESS,
+});
+
+export const setLoanFilterFromHomePage = value => ({
+  type: SET_LOAN_FILTER_VALUE.SUCCESS,
+  payload: value,
 });

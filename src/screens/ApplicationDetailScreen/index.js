@@ -7,6 +7,8 @@ import {viewDocumentHelper} from '../../utils/documentUtils';
 import {
   formatDate,
   formatIndianNumber,
+  formatMonths,
+  formatValueWithUnit,
   getRelativeTime,
   getTimeDifference,
   showToast,
@@ -24,9 +26,11 @@ class ApplicationDetailScreen extends Component {
   };
 
   componentDidMount() {
-    const {applicationID} = this.state;
-    if (applicationID) {
-      this.props.fetchLoanApplicationFromIdThunk(applicationID);
+    const loanId = this.props.route.params.loanId || '';
+    const {selectedLoanApplication} = this.props;
+
+    if (loanId && !selectedLoanApplication) {
+      this.props.fetchLoanApplicationFromIdThunk(loanId);
     }
   }
 
@@ -38,11 +42,11 @@ class ApplicationDetailScreen extends Component {
   getProcessingTime = () => {
     return;
     const submittedOn = this.safeGet(
-      this.props.selectedLoanApplications,
+      this.props.selectedLoanApplication,
       'createdAt',
     );
     const lastUpdatedOn = this.safeGet(
-      this.props.selectedLoanApplications,
+      this.props.selectedLoanApplication,
       'updatedAt',
     );
 
@@ -81,13 +85,13 @@ class ApplicationDetailScreen extends Component {
 
   contactPartner = () => {
     const mobileNumber =
-      this.props.selectedLoanApplications?.partnerUser?.user?.mobileNumber;
+      this.props.selectedLoanApplication?.partnerUser?.user?.mobileNumber;
     this.contactUser('Partner', mobileNumber);
   };
 
   contactCustomer = () => {
     const mobileNumber =
-      this.props.selectedLoanApplications?.customer?.mobileNumber;
+      this.props.selectedLoanApplication?.customer?.mobileNumber;
     this.contactUser('Customer', mobileNumber);
   };
 
@@ -108,19 +112,23 @@ class ApplicationDetailScreen extends Component {
       });
   };
 
-  onTackApplicationPress = () => navigate(ScreenNames.TrackApplication);
+  onTackApplicationPress = () => {
+    navigate(ScreenNames.TrackApplication, {
+      params: this.props.selectedLoanApplication,
+    });
+  };
 
   render() {
-    const {loading, selectedLoanApplications} = this.props;
+    const {loading, selectedLoanApplication} = this.props;
     const {
       partner = {},
       usedVehicle = {},
       customer = {},
       vehicle = {},
-    } = selectedLoanApplications || {};
+    } = selectedLoanApplication || {};
 
-    const submittedOn = this.safeGet(selectedLoanApplications, 'createdAt');
-    const lastUpdatedOn = this.safeGet(selectedLoanApplications, 'updatedAt');
+    const submittedOn = this.safeGet(selectedLoanApplication, 'createdAt');
+    const lastUpdatedOn = this.safeGet(selectedLoanApplication, 'updatedAt');
 
     return (
       <Application_Detail_Component
@@ -139,7 +147,7 @@ class ApplicationDetailScreen extends Component {
           {
             label: 'Loan Amount',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'loanAmount'),
+              this.safeGet(selectedLoanApplication, 'loanAmount'),
             ),
           },
         ]}
@@ -162,24 +170,29 @@ class ApplicationDetailScreen extends Component {
           {
             label: 'Amount',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'loanAmount'),
+              this.safeGet(selectedLoanApplication, 'loanAmount'),
             ),
           },
           {
             label: 'Tenure',
-            value: `${this.safeGet(selectedLoanApplications, 'tenure')} Months`,
+            value: formatValueWithUnit({
+              value: selectedLoanApplication?.tenure,
+              loading,
+              unit: 'Months',
+            }),
           },
           {
             label: 'Interest Rate',
-            value: `${this.safeGet(
-              selectedLoanApplications,
-              'interesetRate',
-            )}%`,
+            value: formatValueWithUnit({
+              value: selectedLoanApplication?.interesetRate,
+              loading,
+              unit: '%',
+            }),
           },
           {
             label: 'EMI',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'emi'),
+              this.safeGet(selectedLoanApplication, 'emi'),
             ),
           },
         ]}
@@ -187,10 +200,10 @@ class ApplicationDetailScreen extends Component {
         isLoading={this.state.isLoading}
         loading={loading}
         loanApplicationId={this.safeGet(
-          selectedLoanApplications,
+          selectedLoanApplication,
           'loanApplicationId',
         )}
-        loanStatus={this.safeGet(selectedLoanApplications, 'status')}
+        loanStatus={this.safeGet(selectedLoanApplication, 'status')}
         businessName={this.safeGet(partner, 'businessName')}
         additionalNotes={usedVehicle?.additionalNotes}
         submittedOn={formatDate(submittedOn)}
@@ -208,7 +221,8 @@ class ApplicationDetailScreen extends Component {
 }
 
 const mapStateToProps = ({applications}) => ({
-  selectedLoanApplications: applications.selectedLoanApplications,
+  selectedLoanApplication: applications.selectedLoanApplication,
+  selectedApplicationId: applications?.selectedApplicationId,
   loading: applications.loading,
 });
 

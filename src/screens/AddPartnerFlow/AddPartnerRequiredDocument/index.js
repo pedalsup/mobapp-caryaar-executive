@@ -77,8 +77,6 @@ class AddPartnerRequiredDocument extends Component {
         };
       });
 
-      console.l;
-
       this.setState({
         fromScreen,
         showImages: get(navState, 'showImages', []),
@@ -150,10 +148,28 @@ class AddPartnerRequiredDocument extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
-        payload,
+        {
+          documents: [
+            {
+              documentType: 'SHOP_LICENSE',
+              documentUrl:
+                'SHOP_LICENSE/ebc5b4dd-1acc-4b31-a4fa-4481def30396-1764828624268.pdf',
+            },
+            {
+              documentType: 'GST_REGISTRATION',
+              documentUrl:
+                'GST_REGISTRATION/1f2fa126-60ce-49d5-b6dd-1b221ff79807-1764828630359.png',
+            },
+            {
+              documentType: 'AADHAR_CARD_FRONT',
+              documentUrl:
+                'AADHAR_CARD_FRONT/bd903a00-81e4-4b35-bbd5-0fe9f3e4c9f4-1764828636857.png',
+            },
+          ],
+        },
         onSuccess => {
           if (onSuccess?.success) {
             navigate(ScreenNames.AddPartnersBankDetail, navigationParams);
@@ -163,6 +179,9 @@ class AddPartnerRequiredDocument extends Component {
       );
       return;
     }
+    console.log('payload--->', JSON.stringify(payload));
+
+    return;
 
     this.props.setDocumentDetails(payload);
     navigate(ScreenNames.AddPartnersBankDetail, navigationParams);

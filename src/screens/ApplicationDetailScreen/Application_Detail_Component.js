@@ -4,21 +4,24 @@ import {
   CardWrapper,
   DetailInfoCard,
   Header,
+  Loader,
   PartnerCard,
   SafeAreaWrapper,
   Spacing,
   Text,
   TextAreaInput,
   theme,
-  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
 import {getApplicationStatusLabel} from '../../constants/enums';
-import {getGradientColors} from '../../utils/helper';
-import DocumentList from './DocumentList';
 import {goBack} from '../../navigation/NavigationUtils';
+import {
+  getApplicationGradientColors,
+  getApplicationStatusColor,
+} from '../../utils/helper';
+import DocumentList from './DocumentList';
 
 const Application_Detail_Component = ({
   onBackPress,
@@ -54,7 +57,8 @@ const Application_Detail_Component = ({
             isStatusBold
             leftText={loanApplicationId}
             status={getApplicationStatusLabel(loanStatus)?.toUpperCase()}
-            gradientColors={getGradientColors(loanStatus)}>
+            statusTextColor={getApplicationStatusColor(loanStatus)}
+            gradientColors={getApplicationGradientColors(loanStatus)}>
             <PartnerCard
               noMargin
               showRightArrow={false}

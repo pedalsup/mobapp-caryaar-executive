@@ -2,6 +2,7 @@
 import {
   Card,
   Header,
+  Loader,
   SafeAreaWrapper,
   Spacing,
   Text,
@@ -9,33 +10,16 @@ import {
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-
+import {formatDate} from '../../utils/helper';
+import {NoDataFound} from '../../components';
 import {goBack} from '../../navigation/NavigationUtils';
 
-const steps = [
-  'Vehicle onboarding',
-  'Customer onboarding',
-  'Lender selection',
-  'Credit - Document verification & approval',
-  'Lender submission',
-  'Lender approval',
-  'DO released',
-  'Ops verifies the DO',
-  'Loan disbursement',
-  'Collection of RC & other docs by PDA',
-  'RTO charge calculation',
-  'Customer agrees to the RTO charges',
-  'Ops ledgers all the invoices',
-  'Finance team transfers the amount',
-  'RC transfer is complete',
-  'Ops verifies the RC transfer & approves',
-  'Held back amount is now released',
-  'Finance marks the ticket as closed',
-];
-
-const completedCount = 12;
-
-export default function LoanTrackingScreen({navigation}) {
+export default function LoanTrackingScreen({
+  navigation,
+  loading,
+  trackingSteps,
+  loanApplicationId,
+}) {
   const handleStepPress = (step, index) => {
     // navigation.navigate('StepDetail', { step, index });
   };
@@ -46,76 +30,90 @@ export default function LoanTrackingScreen({navigation}) {
       <View
         style={{
           padding: theme.sizes.padding,
-          backgroundColor: theme.colors.background,
+          flex: 1,
         }}>
         <Text style={styles.trackingId}>
-          Tracking ID <Text style={styles.id}>#LA0001</Text>
+          Tracking ID <Text style={styles.id}>{loanApplicationId}</Text>
         </Text>
         <Spacing size="md" />
-        <Card padding={0} cardContainerStyle={{height: '93%'}}>
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            showsVerticalScrollIndicator={false}>
-            <View style={styles.timeline}>
-              {steps.map((step, index) => {
-                const completed = index < completedCount;
-                const isLast = index === steps.length - 1;
+        {trackingSteps && trackingSteps.length > 0 ? (
+          <Card padding={0}>
+            <ScrollView
+              contentContainerStyle={styles.scroll}
+              showsVerticalScrollIndicator={false}>
+              <View style={styles.timeline}>
+                {trackingSteps.map((item, index) => {
+                  // const completed = item?.step === 'LOAN_APPLICATION_CREATED';
+                  const completed = true;
+                  const isLast = index === trackingSteps.length - 1;
 
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => handleStepPress(step, index)}
-                    activeOpacity={0.7}>
-                    <View
-                      style={[
-                        styles.stepContainer,
-                        !isLast && styles.stepContainerBorder,
-                      ]}>
-                      <View style={styles.markerWrapper}>
-                        <View
-                          style={[
-                            styles.circle,
-                            completed
-                              ? styles.circleCompleted
-                              : styles.circlePending,
-                          ]}
-                        />
-                        {!isLast && (
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => handleStepPress(item, index)}
+                      activeOpacity={0.7}>
+                      <View
+                        style={[
+                          styles.stepContainer,
+                          !isLast && styles.stepContainerBorder,
+                          isLast && {marginBottom: 0},
+                        ]}>
+                        <View style={styles.markerWrapper}>
                           <View
                             style={[
-                              styles.verticalLine,
+                              styles.circle,
                               completed
-                                ? styles.lineCompleted
-                                : styles.linePending,
+                                ? styles.circleCompleted
+                                : styles.circlePending,
                             ]}
                           />
-                        )}
-                      </View>
+                          {!isLast && (
+                            <View
+                              style={[
+                                styles.verticalLine,
+                                completed
+                                  ? styles.lineCompleted
+                                  : styles.linePending,
+                              ]}
+                            />
+                          )}
+                        </View>
 
-                      <View style={styles.textContainer}>
-                        <Text
-                          style={[
-                            styles.stepText,
-                            completed ? styles.textDone : styles.textPending,
-                            isLast && !completed && styles.finalNote,
-                          ]}>
-                          {step}
-                        </Text>
-                        {completed && (
+                        <View style={styles.textContainer}>
+                          <Text
+                            type="helper-text"
+                            size={15}
+                            style={[
+                              completed ? styles.textDone : styles.textPending,
+                              isLast && styles.finalNote,
+                            ]}>
+                            {item?.recentActivity?.description}
+                          </Text>
+                          <Text style={styles.timestamp}>
+                            {formatDate(
+                              item?.createdAt,
+                              'DD MMM YYYY, hh:mm A',
+                            )}
+                          </Text>
+                          {/* {completed && (
                           <Text style={styles.timestamp}>
                             12 Jan 2025, 3:30 PM
                           </Text>
-                        )}
+                        )} */}
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </ScrollView>
-        </Card>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </Card>
+        ) : (
+          <NoDataFound />
+        )}
         <Spacing size="xl" />
       </View>
+      {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );
 }

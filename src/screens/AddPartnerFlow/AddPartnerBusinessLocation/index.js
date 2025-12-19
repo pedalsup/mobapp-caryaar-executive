@@ -129,9 +129,9 @@ class AddPartnerBusinessLocation extends Component {
       streetAddress: street,
       area,
       state: stateName,
-      pincode: Number(pincode),
-      latitude: '19.076',
-      longitude: '72.877',
+      pincode: pincode,
+      latitude: 19.076,
+      longitude: 72.877,
       city: 'Mumbai',
     };
 
@@ -140,7 +140,7 @@ class AddPartnerBusinessLocation extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
         payLoad,

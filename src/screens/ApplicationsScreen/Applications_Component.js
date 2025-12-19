@@ -2,19 +2,30 @@ import {
   CardWrapper,
   CommonModal,
   ImageHeader,
+  Loader,
+  PaginationFooter,
   PartnerCard,
   RadioButton,
   SafeAreaWrapper,
   Spacing,
+  StatusChip,
+  Text,
   theme,
-  Loader,
-  PaginationFooter,
 } from '@caryaar/components';
 import React from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {NoDataFound} from '../../components';
-import {getApplicationStatusLabel} from '../../constants/enums';
-import {formatDate, getGradientColors} from '../../utils/helper';
+import {
+  applicationStatusOptions,
+  applicationStatusValue,
+  getApplicationStatusLabel,
+  getLabelFromEnum,
+} from '../../constants/enums';
+import {
+  formatDate,
+  getApplicationGradientColors,
+  getApplicationStatusColor,
+} from '../../utils/helper';
 
 const Applications_Component = ({
   onRightIconPress,
@@ -33,23 +44,25 @@ const Applications_Component = ({
   setSearch,
   currentPage,
   totalPages,
+  activeFilterOption,
+  handleFilterApplications,
+  filterApplicationProps,
+  stopLoading,
 }) => {
-  const [isFilterModalVisible, setIsFilterModalVisible] = React.useState(false);
-  const [activeFilterOption, setActiveFilterOption] = React.useState('');
+  const [localActiveFilterOption, setLocalActiveFilterOption] =
+    React.useState(activeFilterOption);
+
+  React.useEffect(() => {
+    setLocalActiveFilterOption(activeFilterOption);
+  }, [activeFilterOption]);
 
   const handleApplyFilter = () => {
-    onPressPrimaryButton?.(activeFilterOption);
-    setActiveFilterOption('');
-    setIsFilterModalVisible(false);
+    filterApplicationProps?.onPressPrimaryButton?.(localActiveFilterOption);
   };
 
-  const handleOpenFilter = () => {
-    setIsFilterModalVisible(true);
-  };
-
-  const handleCloseFilter = () => {
-    setActiveFilterOption('');
-    setIsFilterModalVisible(false);
+  const handleClearFilter = () => {
+    setLocalActiveFilterOption('');
+    filterApplicationProps?.onClearFilterButton?.();
   };
 
   return (
@@ -60,12 +73,24 @@ const Applications_Component = ({
         hideProfileIcon
         subTittle="Applications"
         searchPlaceHolder={'Search by application number...'}
-        onFilterPress={handleOpenFilter}
+        onFilterPress={handleFilterApplications}
         onChangeText={onSearchText}
         value={searchText}
         onCancelIconPress={clearSearch}
         onSubmitEditing={setSearch}
+        hideHeader
+        hideSubHeaderTop={false}
       />
+
+      {activeFilterOption && (
+        <View style={styles.filterWrapper}>
+          <Text type="helper-text">FilterView</Text>
+          <StatusChip
+            label={getLabelFromEnum(applicationStatusValue, activeFilterOption)}
+            onRemove={handleClearFilter}
+          />
+        </View>
+      )}
 
       <FlatList
         contentContainerStyle={styles.wrapper}
@@ -78,7 +103,8 @@ const Applications_Component = ({
             isStatusBold
             leftText={item?.loanApplicationId}
             status={getApplicationStatusLabel(item.status)?.toUpperCase()}
-            gradientColors={getGradientColors(item.status)}
+            gradientColors={getApplicationGradientColors(item?.status)}
+            statusTextColor={getApplicationStatusColor(item?.status)}
             onPress={() => onItemPress?.(item)}
             disableMargin={false}>
             <PartnerCard
@@ -94,9 +120,7 @@ const Applications_Component = ({
         )}
         showsVerticalScrollIndicator={false}
         windowSize={10}
-        ListEmptyComponent={
-          !loading && <NoDataFound text="No Application Found" />
-        }
+        ListEmptyComponent={(!loading || stopLoading) && <NoDataFound />}
         onRefresh={onRefresh}
         refreshing={refreshing}
         onEndReached={onEndReached}
@@ -113,26 +137,30 @@ const Applications_Component = ({
       />
 
       <CommonModal
-        isVisible={isFilterModalVisible}
-        onModalHide={handleCloseFilter}
+        isVisible={filterApplicationProps?.isVisible}
+        onModalHide={() => {
+          filterApplicationProps?.handleCloseFilter?.();
+        }}
         primaryButtonLabel={'Apply'}
         isScrollableContent={true}
         isPrimaryButtonVisible={true}
+        showSecondaryButton
+        secondaryButtonText={'Clear'}
         onPressPrimaryButton={handleApplyFilter}
+        onSecondaryPress={handleClearFilter}
         isTextCenter={false}
         title="Filter by">
-        <View style={{paddingVertical: 10}}>
-          <RadioButton
-            label={'Saved Vehicles'}
-            selected={activeFilterOption === 'Saved'}
-            onPress={() => setActiveFilterOption('Saved')}
-          />
-          <Spacing />
-          <RadioButton
-            label={'Draft Vehicles'}
-            selected={activeFilterOption === 'Draft'}
-            onPress={() => setActiveFilterOption('Draft')}
-          />
+        <View style={{paddingVertical: 10, marginBottom: -20}}>
+          {applicationStatusOptions.map((option, index) => (
+            <React.Fragment key={`${option.label}-${index}`}>
+              <RadioButton
+                label={option.label}
+                selected={localActiveFilterOption === option.value}
+                onPress={() => setLocalActiveFilterOption(option.value)}
+              />
+              <Spacing />
+            </React.Fragment>
+          ))}
         </View>
       </CommonModal>
       {loading && <Loader visible={loading} />}
@@ -145,6 +173,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: theme.colors.background,
     padding: theme.sizes.padding,
+  },
+  filterWrapper: {
+    paddingHorizontal: 25,
+    paddingTop: 15,
+    paddingBottom: 5,
+    backgroundColor: theme.colors.background,
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignItems: 'center',
   },
 });
 
