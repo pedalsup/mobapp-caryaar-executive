@@ -36,6 +36,11 @@ export const fetchPartnerFromId = (partnerId, onSuccess, onFailure) => {
       const response = await fetchPartnerById(partnerId);
       const partnerData = response.data;
 
+      console.log(
+        'response_fetchPartnerFromId------>',
+        JSON.stringify(response),
+      );
+
       const {
         basicDetails,
         locationDetails,

@@ -388,8 +388,6 @@ export const transformDocumentData = async (responseData, documentKey = []) => {
       typeof responseData[key] === 'string',
   );
 
-  console.log({fileKeys});
-
   for (const key of fileKeys) {
     const uri = responseData[key];
     const acceptedDocType = responseData[documentType[key]];
@@ -491,6 +489,24 @@ export const getDocumentLink = async uri => {
  * @param {(type: string, url?: string) => void} onPressHandler - Callback when item is pressed.
  * @returns {Array} - List of document objects.
  */
+// export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
+//   const allDocTypes = Object.keys(partnerDocumentLabelMap);
+//   const uploadedDocs = partnerDetail?.documents || [];
+//   const missingDocs = partnerDetail?.missingDocuments || [];
+
+//   return allDocTypes.map(type => {
+//     const uploadedDoc = findUploadedDoc(type, uploadedDocs);
+//     return {
+//       label: partnerDocumentLabelMap[type],
+//       documentType: type,
+//       uploaded: !!uploadedDoc,
+//       isMissing: missingDocs.includes(type),
+//       ...uploadedDoc,
+//       onPress: () => onPressHandler(type, uploadedDoc?.documentUrl),
+//     };
+//   });
+// };
+
 export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
   const allDocTypes = Object.keys(partnerDocumentLabelMap);
   const uploadedDocs = partnerDetail?.documents || [];
@@ -498,13 +514,17 @@ export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
 
   return allDocTypes.map(type => {
     const uploadedDoc = findUploadedDoc(type, uploadedDocs);
+    const uploaded = !!uploadedDoc;
+    const isMissing = missingDocs.includes(type);
+
     return {
       label: partnerDocumentLabelMap[type],
       documentType: type,
-      uploaded: !!uploadedDoc,
-      isMissing: missingDocs.includes(type),
+      uploaded,
+      isMissing,
       ...uploadedDoc,
-      onPress: () => onPressHandler(type, uploadedDoc?.documentUrl),
+      onPress: () =>
+        onPressHandler(type, uploadedDoc?.documentUrl, isMissing || !uploaded),
     };
   });
 };
@@ -550,7 +570,7 @@ export const transformPartnerDocumentData = async (
       formattedData[key] = {
         uploadKey: uri,
         uploadedUrl: uri,
-        uri: data?.url || uri,
+        uri: data?.url || null,
         isLocal: false,
         selectedDocType: key,
         ...doc,

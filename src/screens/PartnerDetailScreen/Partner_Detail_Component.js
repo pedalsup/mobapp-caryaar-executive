@@ -6,6 +6,7 @@ import {
   SafeAreaWrapper,
   Spacing,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
@@ -22,6 +23,7 @@ const Partner_Detail_Component = ({
   footerInfo,
   onEditPartnerDetail,
   businessName,
+  isLoading,
 }) => {
   return (
     <SafeAreaWrapper backgroundColor={theme.colors.background}>
@@ -96,6 +98,8 @@ const Partner_Detail_Component = ({
           <DetailInfoCard label="Account Detail" data={accountDetail} />
         </View>
       </ScrollView>
+
+      {isLoading && <Loader isLoading={isLoading} />}
     </SafeAreaWrapper>
   );
 };

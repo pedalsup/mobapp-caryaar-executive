@@ -64,7 +64,6 @@ class AddPartnerRequiredDocument extends Component {
       );
 
       let detail = await this.convertFormattedToDetails(formattedDocuments);
-      console.log({detail});
 
       detail?.forEach(doc => {
         formattedDocs[doc.documentType] = {
@@ -179,9 +178,6 @@ class AddPartnerRequiredDocument extends Component {
       );
       return;
     }
-    console.log('payload--->', JSON.stringify(payload));
-
-    return;
 
     this.props.setDocumentDetails(payload);
     navigate(ScreenNames.AddPartnersBankDetail, navigationParams);
@@ -236,10 +232,11 @@ class AddPartnerRequiredDocument extends Component {
       id: doc.id,
       partnerId: doc.partnerId,
       documentType: doc.documentType || doc.selectedDocType,
-      documentUrl: doc.uploadedUrl || doc.uri,
+      documentUrl: doc.uri,
       verifiedByOps: doc.verifiedByOps ?? 'PENDING',
       uploadedAt: doc.uploadedAt || null,
       updatedAt: doc.updatedAt || null,
+      uploadedUrl: doc.uploadedUrl,
     }));
 
     return documentDetails;

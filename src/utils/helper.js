@@ -5,6 +5,7 @@ import theme from '../theme';
 import colors from '../theme/colors';
 import {navigate} from '../navigation/NavigationUtils';
 import ScreenNames from '../constants/ScreenNames';
+import get from 'lodash/get';
 
 /**
  * Format a numeric value into Indian currency style (e.g., ₹12,34,567.89)
@@ -452,4 +453,17 @@ export const getApplicationStatusColor = status => {
     default:
       return theme.colors.textPrimary;
   }
+};
+
+/**
+ * Safely gets a value from an object, returns fallback if loading or value is undefined.
+ *
+ * @param {Object} obj - The source object.
+ * @param {string | Array<string>} path - Path to the property (lodash-style).
+ * @param {boolean} loading - If true, fallback will be returned regardless of value.
+ * @param {*} fallback - The fallback value if not found or loading is true.
+ * @returns {*} The resolved value or fallback.
+ */
+export const safeGet = (loading = false, obj, path, fallback = '-') => {
+  return loading ? fallback : get(obj, path, fallback);
 };

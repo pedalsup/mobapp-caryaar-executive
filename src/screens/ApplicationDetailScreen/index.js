@@ -264,8 +264,6 @@ class ApplicationDetailScreen extends Component {
       loanDocuments,
     );
 
-    console.log({typeOfIndividual, loanProduct, docs});
-
     return (
       <Application_Detail_Component
         applicationDetail={this.state.applicationDetail}

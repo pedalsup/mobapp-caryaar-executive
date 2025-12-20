@@ -39,6 +39,7 @@ class TrackApplicationScreen extends Component {
 
   render() {
     const {loanApplicationId, trackingSteps, loading} = this.state;
+
     return (
       <Track_Application_Component
         loading={loading}

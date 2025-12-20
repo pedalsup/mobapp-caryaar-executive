@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   wrapper: {
     padding: theme.sizes.padding,
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   row: {
     flexDirection: 'row',

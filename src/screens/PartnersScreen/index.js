@@ -246,6 +246,32 @@ class PartnersScreen extends Component {
   // To fetch specific partner detail from API
   fetchPartnerFromId = partnerID => {
     this.setState({apiTrigger: 'default'});
+    // this.props.fetchPartnerFromId(
+    //   partnerID,
+    //   success => {
+    //     this.props.navigation.reset({
+    //       index: 2, // current screen index
+    //       routes: [
+    //         {
+    //           name: ScreenNames.AddPartnerBasicDetail,
+    //           params: {
+    //             fromScreen: true,
+    //             showImages: [1, 2, 3, 4],
+    //             errorSteps: [3],
+    //           },
+    //         },
+    //         {
+    //           name: ScreenNames.AddPartnerBusinessLocation,
+    //         },
+    //         {
+    //           name: ScreenNames.AddPartnerRequiredDocument,
+    //         },
+    //       ],
+    //     });
+    //   },
+    //   error => this.setState({isLoading: false}),
+    // );
+
     this.props.fetchPartnerFromId(
       partnerID,
       success => {

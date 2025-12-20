@@ -1,4 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+
 import {
   Card,
   Header,
@@ -8,55 +10,57 @@ import {
   Text,
   theme,
 } from '@caryaar/components';
-import React from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {formatDate} from '../../utils/helper';
+
 import {NoDataFound} from '../../components';
+import {formatDate} from '../../utils/helper';
 import {goBack} from '../../navigation/NavigationUtils';
 
-export default function LoanTrackingScreen({
+const LoanTrackingScreen = ({
   navigation,
   loading,
   trackingSteps,
   loanApplicationId,
-}) {
+}) => {
   const handleStepPress = (step, index) => {
     // navigation.navigate('StepDetail', { step, index });
   };
 
+  const hasData = trackingSteps?.length > 0;
+
   return (
-    <SafeAreaWrapper backgroundColor={theme.colors.background}>
-      <Header title="Loan Application Tracking" onBackPress={() => goBack()} />
-      <View
-        style={{
-          padding: theme.sizes.padding,
-          flex: 1,
-        }}>
-        <Text style={styles.trackingId}>
-          Tracking ID <Text style={styles.id}>{loanApplicationId}</Text>
+    <SafeAreaWrapper>
+      <Header title="Loan Application Tracking" onBackPress={goBack} />
+
+      <View style={styles.container}>
+        <Text>
+          Tracking ID{' '}
+          <Text hankenGroteskBold color={'#FFA500'}>
+            {loanApplicationId}
+          </Text>
         </Text>
-        <Spacing size="md" />
-        {trackingSteps && trackingSteps.length > 0 ? (
-          <Card padding={0}>
+
+        {hasData ? (
+          <Card
+            padding={0}
+            cardContainerStyle={{marginVertical: theme.sizes.spacing.smd}}>
             <ScrollView
               contentContainerStyle={styles.scroll}
               showsVerticalScrollIndicator={false}>
               <View style={styles.timeline}>
                 {trackingSteps.map((item, index) => {
-                  // const completed = item?.step === 'LOAN_APPLICATION_CREATED';
-                  const completed = true;
+                  const completed = true; // TODO: replace with real condition
                   const isLast = index === trackingSteps.length - 1;
 
                   return (
                     <TouchableOpacity
                       key={index}
-                      onPress={() => handleStepPress(item, index)}
-                      activeOpacity={0.7}>
+                      activeOpacity={0.7}
+                      onPress={() => handleStepPress(item, index)}>
                       <View
                         style={[
                           styles.stepContainer,
                           !isLast && styles.stepContainerBorder,
-                          isLast && {marginBottom: 0},
+                          isLast && styles.lastStep,
                         ]}>
                         <View style={styles.markerWrapper}>
                           <View
@@ -67,6 +71,7 @@ export default function LoanTrackingScreen({
                                 : styles.circlePending,
                             ]}
                           />
+
                           {!isLast && (
                             <View
                               style={[
@@ -82,24 +87,22 @@ export default function LoanTrackingScreen({
                         <View style={styles.textContainer}>
                           <Text
                             type="helper-text"
-                            size={15}
                             style={[
                               completed ? styles.textDone : styles.textPending,
                               isLast && styles.finalNote,
                             ]}>
                             {item?.recentActivity?.description}
                           </Text>
-                          <Text style={styles.timestamp}>
+
+                          <Text
+                            size="caption"
+                            color={theme.colors.gray500}
+                            style={styles.timestamp}>
                             {formatDate(
                               item?.createdAt,
                               'DD MMM YYYY, hh:mm A',
                             )}
                           </Text>
-                          {/* {completed && (
-                          <Text style={styles.timestamp}>
-                            12 Jan 2025, 3:30 PM
-                          </Text>
-                        )} */}
                         </View>
                       </View>
                     </TouchableOpacity>
@@ -111,27 +114,46 @@ export default function LoanTrackingScreen({
         ) : (
           <NoDataFound />
         )}
+
         <Spacing size="xl" />
       </View>
-      {loading && <Loader visible={loading} />}
+
+      {loading && <Loader visible />}
     </SafeAreaWrapper>
   );
-}
+};
 
 const CIRCLE_SIZE = 14;
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
-  header: {backgroundColor: '#000', padding: 16},
-  title: {color: '#fff', fontSize: 18, fontWeight: '600'},
-  id: {color: '#FFA500'},
-  scroll: {flexGrow: 1, padding: 12},
-  timeline: {paddingLeft: 0},
+  container: {
+    flex: 1,
+    padding: theme.sizes.padding,
+    backgroundColor: theme.colors.background,
+  },
+
+  scroll: {
+    flexGrow: 1,
+    padding: 12,
+  },
+
+  timeline: {
+    paddingLeft: 0,
+  },
 
   stepContainer: {
     flexDirection: 'row',
-    marginBottom: 32,
+    marginBottom: 15,
     alignItems: 'flex-start',
+  },
+  stepContainerBorder: {
+    // borderBottomWidth: 1,
+    // borderBottomColor: '#e5e7eb',
+    // paddingBottom: 20, // Border under the nite
+  },
+
+  lastStep: {
+    marginBottom: 0,
   },
 
   markerWrapper: {
@@ -161,7 +183,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: CIRCLE_SIZE + 2,
     width: 2,
-    height: 60,
+    height: '100%',
   },
 
   lineCompleted: {
@@ -177,16 +199,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  stepText: {
-    fontSize: 15,
-    fontWeight: '500',
+  textDone: {
+    color: theme.colors.black,
   },
 
-  textDone: {color: '#000'},
-  textPending: {color: '#9ca3af'},
+  textPending: {
+    color: '#9ca3af',
+  },
+
   timestamp: {
-    fontSize: 12,
-    color: '#6b7280',
     marginTop: 4,
   },
 
@@ -195,9 +216,6 @@ const styles = StyleSheet.create({
     color: '#16a34a',
     marginTop: 4,
   },
-  stepContainerBorder: {
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#e5e7eb',
-    // paddingBottom: 20,
-  },
 });
+
+export default LoanTrackingScreen;
