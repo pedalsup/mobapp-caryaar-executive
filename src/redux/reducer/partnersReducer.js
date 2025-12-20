@@ -1,5 +1,9 @@
+import {PARTNER_TAB_OPTIONS} from '../../constants/enums';
 import {types} from '../actions';
-import {SET_IS_EXISTING_PARTNER} from '../actions/actionType';
+import {
+  SET_IS_EXISTING_PARTNER,
+  SET_PARTNER_ACTIVE_TAB,
+} from '../actions/actionType';
 
 const initialState = {
   loading: false,
@@ -19,6 +23,7 @@ const initialState = {
   searchTotalPages: 0, // 1
   selectedPartnerId: null,
   isExistingPartner: false,
+  activeTab: PARTNER_TAB_OPTIONS[0],
 };
 
 const partnersReducer = (state = initialState, action) => {
@@ -146,6 +151,9 @@ const partnersReducer = (state = initialState, action) => {
 
     case SET_IS_EXISTING_PARTNER.SUCCESS:
       return {...state, isExistingPartner: action.payload};
+
+    case SET_PARTNER_ACTIVE_TAB.SUCCESS:
+      return {...state, activeTab: action.payload};
 
     case types.RESET_APP_STATE:
       return initialState;

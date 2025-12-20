@@ -206,41 +206,7 @@ class PartnersScreen extends Component {
   // Pending Partner Button click (Upload Documents)
   callToAction = selectedPartner => {
     this.props.resetPartnerDetail();
-
     this.fetchPartnerFromId(selectedPartner?.id);
-    return;
-    //TODO remove bellow comment if api start accepting banking detail
-    // this.props.setSelectedPartner(selectedPartner);
-
-    // const {
-    //   basicDetails,
-    //   locationDetails,
-    //   bankingDetails,
-    //   sellerType,
-    //   partnerType,
-    //   isMultiUser,
-    //   partnerRole,
-    // } = formatPartnerDetails(selectedPartner);
-
-    // this.props.setUserType(isMultiUser);
-    // this.props.setPartnerRole(partnerRole);
-    // this.props.setDealershipType(partnerType);
-    // this.props.setSellerType(sellerType);
-    // this.props.setBasicDetails(basicDetails);
-    // this.props.setLocationDetails(locationDetails);
-    // this.props.setBankingDetails(bankingDetails);
-    // this.props.setDocumentDetails(selectedPartner?.documents);
-    // return;
-
-    setTimeout(() => {
-      navigate(ScreenNames.AddPartnerRequiredDocument, {
-        params: {
-          fromScreen: true,
-          showImages: [1, 2, 3, 4],
-          errorSteps: [3],
-        },
-      });
-    }, 100);
   };
 
   // To fetch specific partner detail from API
@@ -275,7 +241,8 @@ class PartnersScreen extends Component {
     this.props.fetchPartnerFromId(
       partnerID,
       success => {
-        navigate(ScreenNames.AddPartnerBasicDetail, {
+        this.props.setIsExistingPartner(true);
+        navigate(ScreenNames.AddPartnerRequiredDocument, {
           params: {
             fromScreen: true,
             showImages: [1, 2, 3, 4],
@@ -318,7 +285,7 @@ class PartnersScreen extends Component {
         searchText={searchText}
         clearSearch={this.clearSearch}
         setSearch={this.searchFromAPI}
-        apiTrigger={this.state.apiTrigger}
+        apiTrigger={apiTrigger}
       />
     );
   }

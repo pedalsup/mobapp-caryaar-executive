@@ -19,7 +19,7 @@ import {
   setSellerType,
   setUserType,
 } from './partnerFormActions';
-import {SET_IS_EXISTING_PARTNER} from './actionType';
+import {SET_IS_EXISTING_PARTNER, SET_PARTNER_ACTIVE_TAB} from './actionType';
 
 /**
  * Thunk to fetch a specific partner's details by ID.
@@ -310,4 +310,9 @@ export const resetPartnerDetail = () => ({
 export const setIsExistingPartner = isExisting => ({
   type: SET_IS_EXISTING_PARTNER.SUCCESS,
   payload: isExisting,
+});
+
+export const setPartnerActiveTab = activeTab => ({
+  type: SET_PARTNER_ACTIVE_TAB.SUCCESS,
+  payload: activeTab,
 });

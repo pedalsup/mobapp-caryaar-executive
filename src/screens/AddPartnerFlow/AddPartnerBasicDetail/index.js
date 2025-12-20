@@ -94,6 +94,8 @@ class AddPartnerBasicDetail extends Component {
     const isFormValid = this.validateAllFields();
     const {selectedPartnerId, isExistingPartner} = this.props;
 
+    console.log({isExistingPartner});
+
     if (!isFormValid) {
       showToast('warning', 'Required field cannot be empty.', 'bottom', 3000);
       return;

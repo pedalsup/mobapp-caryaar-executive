@@ -320,7 +320,7 @@ export const validateRequiredDocuments = (documents, requiredFields) => {
 
   if (missingFields.length > 0) {
     const missingLabels = missingFields
-      .map(field => documentImageLabelMap?.[field] || field)
+      .map(field => partnerDocumentLabelMap?.[field] || field)
       .join(', ');
     showToast('error', `Please upload: ${missingLabels}`, 'bottom', 3500);
     return false;

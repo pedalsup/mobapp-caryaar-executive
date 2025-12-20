@@ -20,8 +20,6 @@ import {
   removeCountryCode,
 } from '../../utils/helper';
 
-const limit = 10;
-
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 const Partner_Component = ({

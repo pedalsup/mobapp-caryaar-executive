@@ -135,9 +135,9 @@ class AddPartnerRequiredDocument extends Component {
 
     const {selectedPartnerId, isExistingPartner} = this.props;
 
-    if (!validateRequiredDocuments(documents, requiredFields)) {
-      return;
-    }
+    // if (!validateRequiredDocuments(documents, requiredFields)) {
+    //   return;
+    // }
     let payload = Object.keys(documents).map(key => ({
       documentType: key,
       documentUrl: documents[key].uploadedUrl,
@@ -147,7 +147,7 @@ class AddPartnerRequiredDocument extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (isExistingPartner) {
+    if (!isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
         {

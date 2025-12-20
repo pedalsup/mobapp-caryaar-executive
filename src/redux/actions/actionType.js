@@ -21,3 +21,6 @@ export const RESET_LOAN_APPLICATION = createAsyncActionTypes(
 export const SET_LOAN_FILTER_VALUE = createAsyncActionTypes(
   'SET_LOAN_FILTER_VALUE',
 );
+export const SET_PARTNER_ACTIVE_TAB = createAsyncActionTypes(
+  'SET_PARTNER_ACTIVE_TAB',
+);
