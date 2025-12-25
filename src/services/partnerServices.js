@@ -23,6 +23,23 @@ export const fetchPartnersByStatus = async (status, page = 1, limit = 10) => {
   }
 };
 
+export const fetchPartners = async (page = 1, limit = 10, payload = {}) => {
+  try {
+    const response = await axiosInstance.get(endpoints.PARTNERS.LIST, {
+      ...payload,
+      params: {
+        page,
+        limit,
+        ...(payload.params || {}),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch customers:', JSON.stringify(error));
+    throw error;
+  }
+};
+
 /**
  * Fetches the partner details for a specific partner ID from the backend.
  *

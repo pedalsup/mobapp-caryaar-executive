@@ -1,5 +1,8 @@
 import {types} from '../actions';
 import {
+  CLEAR_LOAN_SEARCH,
+  FETCH_LOAN_APPLICATION_BY_ID,
+  FETCH_LOAN_APPLICATIONS,
   RESET_LOAN_APPLICATION,
   SET_LOAN_FILTER_VALUE,
 } from '../actions/actionType';
@@ -21,14 +24,14 @@ const initialState = {
 
 const loanApplicationReducer = (state = initialState, action) => {
   switch (action.type) {
-    case types.FETCH_LOAN_APPLICATIONS_REQUEST:
-    case types.SEARCH_LOAN_APPLICATIONS_REQUEST:
+    case FETCH_LOAN_APPLICATIONS.REQUEST:
+    case FETCH_LOAN_APPLICATION_BY_ID.REQUEST:
       return {
         ...state,
         loading: true,
       };
 
-    case types.FETCH_LOAN_APPLICATIONS_SUCCESS:
+    case FETCH_LOAN_APPLICATIONS.SUCCESS:
       const {
         applications,
         pagination: {page, totalPages},
@@ -57,14 +60,14 @@ const loanApplicationReducer = (state = initialState, action) => {
         };
       }
 
-    case types.FETCH_LOAN_APPLICATIONS_FAILURE:
-    case types.SEARCH_LOAN_APPLICATIONS_FAILURE:
+    case FETCH_LOAN_APPLICATION_BY_ID.FAILURE:
+    case FETCH_LOAN_APPLICATIONS.FAILURE:
       return {
         ...state,
         loading: false,
       };
 
-    case types.FETCH_LOAN_APPLICATIONS_BY_ID_SUCCESS:
+    case FETCH_LOAN_APPLICATION_BY_ID.SUCCESS:
       return {
         ...state,
         loading: false,
@@ -72,21 +75,7 @@ const loanApplicationReducer = (state = initialState, action) => {
         selectedApplicationId: action.payload?.id,
       };
 
-    case types.SEARCH_LOAN_APPLICATIONS_SUCCESS:
-      return {
-        ...state,
-        searchedLoanApplications:
-          action.payload.page === 1
-            ? action.payload.data
-            : [...state.searchedLoanApplications, ...action.payload.data],
-        loading: false,
-        message: action.payload.message,
-        success: action.payload.success,
-        searchPage: action.payload.page,
-        searchTotalPages: action.payload.totalPages,
-      };
-
-    case types.CLEAR_LOAN_SEARCH:
+    case CLEAR_LOAN_SEARCH:
       return {
         ...state,
         searchedLoanApplications: [],

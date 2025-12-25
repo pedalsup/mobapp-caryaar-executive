@@ -1,4 +1,8 @@
 import {types} from '../actions';
+import {
+  FETCH_PARTNER_PERFORMANCES,
+  FETCH_PARTNER_STATS,
+} from '../actions/actionType';
 
 const initialState = {
   loading: false,
@@ -8,43 +12,31 @@ const initialState = {
 
 const performanceReducer = (state = initialState, action) => {
   switch (action.type) {
-    case types.PARTNER_PERFORMANCE_REQUEST:
+    case FETCH_PARTNER_PERFORMANCES.REQUEST:
       return {
         ...state,
         loading: true,
       };
 
-    case types.PARTNER_PERFORMANCE_SUCCESS:
+    case FETCH_PARTNER_PERFORMANCES.SUCCESS:
       return {
         ...state,
         loading: false,
         partnerPerformances: action.payload.data,
       };
 
-    case types.PARTNER_PERFORMANCE_STATS_SUCCESS:
+    case FETCH_PARTNER_STATS.SUCCESS:
       return {
         ...state,
         loading: false,
         partnerStats: action.payload.data,
       };
 
-    case types.PARTNER_PERFORMANCE_FAILURE:
-    case types.PARTNER_PERFORMANCE_STATS_FAILURE:
+    case FETCH_PARTNER_PERFORMANCES.FAILURE:
+    case FETCH_PARTNER_STATS.FAILURE:
       return {
         ...state,
         loading: false,
-      };
-
-    case types.RESET_PARTNER_PERFORMANCE:
-      return {
-        ...state,
-        partnerPerformances: [],
-      };
-
-    case types.RESET_PARTNER_PERFORMANCE:
-      return {
-        ...state,
-        partnerStats: {},
       };
 
     case types.RESET_APP_STATE:

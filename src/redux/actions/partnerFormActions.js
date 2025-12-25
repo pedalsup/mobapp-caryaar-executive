@@ -1,3 +1,4 @@
+import {CLEAR_PARTNER_FORM, RESET_REGISTRATION} from './actionType';
 import types from './types';
 
 /**
@@ -50,7 +51,7 @@ export const setBankingDetails = payload => ({
  * @returns {Object} Redux action.
  */
 export const clearPartnerForm = () => ({
-  type: types.CLEAR_PARTNER_FORM,
+  type: CLEAR_PARTNER_FORM,
 });
 
 /**
@@ -103,5 +104,5 @@ export const setPartnerRole = role => ({
  * @returns {Object} Redux action.
  */
 export const resetRegistration = () => ({
-  type: types.RESET_REGISTRATION,
+  type: RESET_REGISTRATION,
 });

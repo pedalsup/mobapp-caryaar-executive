@@ -7,7 +7,6 @@ import {
   createSalesExecutiveThunk,
   deleteSalesExecutiveByIdThunk,
   fetchSalesExecutivesThunk,
-  removeSalesExecutive,
 } from '../../../redux/actions';
 import {
   formatMobileNumber,
@@ -278,7 +277,6 @@ class ManageMemberScreen extends Component {
 const mapDispatchToProps = {
   fetchSalesExecutivesThunk,
   deleteSalesExecutiveByIdThunk,
-  removeSalesExecutive,
   createSalesExecutiveThunk,
 };
 const mapStateToProps = ({appState, salesExecutives}) => {

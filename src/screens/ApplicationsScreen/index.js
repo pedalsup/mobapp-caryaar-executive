@@ -6,7 +6,6 @@ import {
   clearLoanSearch,
   fetchLoanApplicationsThunk,
   resetLoanApplication,
-  searchLoanApplicationThunk,
   setLoanFilterFromHomePage,
 } from '../../redux/actions';
 import Applications_Component from './Applications_Component';
@@ -139,10 +138,10 @@ class ApplicationsScreen extends Component {
         return;
       }
 
-      if (trimmed !== this.state.previousSearch) {
-        this.setState({stopLoading: true, previousSearch: trimmed});
-        this.debouncedSearch(trimmed);
-      }
+      // if (trimmed !== this.state.previousSearch) {
+      //   this.setState({stopLoading: true, previousSearch: trimmed});
+      //   this.debouncedSearch(trimmed);
+      // }
     });
   };
 
@@ -271,7 +270,6 @@ const mapStateToProps = ({applications}) => ({
 const mapDispatchToProps = {
   fetchLoanApplicationsThunk,
   clearLoanSearch,
-  searchLoanApplicationThunk,
   resetLoanApplication,
   setLoanFilterFromHomePage,
 };

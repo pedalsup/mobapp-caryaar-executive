@@ -10,19 +10,12 @@ import {
   showApiSuccessToast,
   showToast,
 } from '../../utils/helper';
-
-/**
- * Action creator to remove a sales executive by ID.
- *
- * @param {string} id - The ID of the sales executive to remove.
- * @returns {Object} The action object to be dispatched.
- * @property {string} type - The action type, which will be `REMOVE_SALES_EXECUTIVE`.
- * @property {string} payload - The ID of the sales executive to remove.
- */
-export const removeSalesExecutive = id => ({
-  type: types.REMOVE_SALES_EXECUTIVE,
-  payload: id,
-});
+import {
+  ADD_SALES_EXECUTIVE,
+  FETCH_SALES_EXECUTIVES,
+  REMOVE_SALES_EXECUTIVE,
+  REMOVE_SALES_EXECUTIVE_BY_ID,
+} from './actionType';
 
 /**
  * Action creator to reset the state of sales executives.
@@ -50,14 +43,14 @@ export const fetchSalesExecutivesThunk = (
   onFailure,
 ) => {
   return async dispatch => {
-    dispatch({type: types.FETCH_SALES_EXECUTIVE_REQUEST});
+    dispatch({type: FETCH_SALES_EXECUTIVES.REQUEST});
 
     try {
       const response = await fetchSalesExecutives(
         `page=${page}&limit=${limit}`,
       );
       dispatch({
-        type: types.FETCH_SALES_EXECUTIVE_SUCCESS,
+        type: FETCH_SALES_EXECUTIVES.SUCCESS,
         payload: {
           data: response.data,
           page: response.pagination.page,
@@ -71,7 +64,7 @@ export const fetchSalesExecutivesThunk = (
     } catch (error) {
       showApiErrorToast(error);
       dispatch({
-        type: types.FETCH_SALES_EXECUTIVE_FAILURE,
+        type: FETCH_SALES_EXECUTIVES.FAILURE,
         payload: {
           message: getErrorMessage(error),
           success: false,
@@ -97,24 +90,23 @@ export const deleteSalesExecutiveByIdThunk = (
   onFailure,
 ) => {
   return async dispatch => {
-    dispatch({type: types.REMOVE_SALES_EXECUTIVE_REQUEST});
+    dispatch({type: REMOVE_SALES_EXECUTIVE_BY_ID.REQUEST});
     try {
       const response = await deleteSalesExecutiveById(partnerId);
       dispatch({
-        type: types.REMOVE_SALES_EXECUTIVE_SUCCESS,
+        type: REMOVE_SALES_EXECUTIVE_BY_ID.SUCCESS,
         payload: response,
       });
       dispatch({
-        type: types.REMOVE_SALES_EXECUTIVE,
+        type: REMOVE_SALES_EXECUTIVE,
         payload: partnerId,
       });
-      removeSalesExecutive(partnerId);
       onSuccess?.(response);
       showApiSuccessToast(response);
     } catch (error) {
       showApiErrorToast(error);
       dispatch({
-        type: types.REMOVE_SALES_EXECUTIVE_FAILURE,
+        type: REMOVE_SALES_EXECUTIVE_BY_ID.FAILURE,
         payload: error.message,
       });
       onFailure?.(error.message);
@@ -132,13 +124,13 @@ export const deleteSalesExecutiveByIdThunk = (
  */
 export const createSalesExecutiveThunk = (param, onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.FETCH_SALES_EXECUTIVE_REQUEST});
+    dispatch({type: ADD_SALES_EXECUTIVE.REQUEST});
 
     try {
       const response = await createSalesExecutive(param);
 
       dispatch({
-        type: types.ADD_SALES_EXECUTIVE,
+        type: ADD_SALES_EXECUTIVE.SUCCESS,
         payload: {
           id: response.data?.id,
           userId: response.data?.userId,
@@ -162,7 +154,7 @@ export const createSalesExecutiveThunk = (param, onSuccess, onFailure) => {
     } catch (error) {
       showApiErrorToast(error);
       dispatch({
-        type: types.FETCH_SALES_EXECUTIVE_FAILURE,
+        type: ADD_SALES_EXECUTIVE.FAILURE,
         payload: {
           message: getErrorMessage(error),
           success: false,

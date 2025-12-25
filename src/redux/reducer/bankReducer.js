@@ -1,4 +1,5 @@
 import {types} from '../actions';
+import {CLEAR_PARTNER_FORM, RESET_REGISTRATION} from '../actions/actionType';
 
 const initialState = {
   bankSuggestions: [],
@@ -38,8 +39,8 @@ const bankReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       };
-    case types.RESET_REGISTRATION:
-    case types.CLEAR_PARTNER_FORM:
+    case RESET_REGISTRATION:
+    case CLEAR_PARTNER_FORM:
     case types.RESET_APP_STATE:
       return initialState;
     default:

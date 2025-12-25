@@ -4,8 +4,13 @@ import {
   searchLoanApplicationByKeyword,
 } from '../../services';
 import {showApiErrorToast} from '../../utils/helper';
-import {RESET_LOAN_APPLICATION, SET_LOAN_FILTER_VALUE} from './actionType';
-import types from './types';
+import {
+  CLEAR_LOAN_SEARCH,
+  FETCH_LOAN_APPLICATION_BY_ID,
+  FETCH_LOAN_APPLICATIONS,
+  RESET_LOAN_APPLICATION,
+  SET_LOAN_FILTER_VALUE,
+} from './actionType';
 
 /**
  * Thunk to fetch a paginated list of loan applications.
@@ -24,7 +29,7 @@ export const fetchLoanApplicationsThunk = (
   onFailure,
 ) => {
   return async dispatch => {
-    dispatch({type: types.FETCH_LOAN_APPLICATIONS_REQUEST});
+    dispatch({type: FETCH_LOAN_APPLICATIONS.REQUEST});
 
     try {
       const response = await fetchLoanApplications(page, limit, payload);
@@ -32,7 +37,7 @@ export const fetchLoanApplicationsThunk = (
       const applications = response.data || [];
 
       dispatch({
-        type: types.FETCH_LOAN_APPLICATIONS_SUCCESS,
+        type: FETCH_LOAN_APPLICATIONS.SUCCESS,
         payload: {
           applications,
           pagination: response.pagination,
@@ -42,7 +47,7 @@ export const fetchLoanApplicationsThunk = (
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.FETCH_LOAN_APPLICATIONS_FAILURE,
+        type: FETCH_LOAN_APPLICATIONS.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -61,18 +66,18 @@ export const fetchLoanApplicationsThunk = (
  */
 export const fetchLoanApplicationFromIdThunk = (id, onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.FETCH_LOAN_APPLICATIONS_REQUEST});
+    dispatch({type: FETCH_LOAN_APPLICATION_BY_ID.REQUEST});
 
     try {
       const response = await fetchLoanApplicationById(id);
       dispatch({
-        type: types.FETCH_LOAN_APPLICATIONS_BY_ID_SUCCESS,
+        type: FETCH_LOAN_APPLICATION_BY_ID.SUCCESS,
         payload: response.data?.[0],
       });
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.FETCH_LOAN_APPLICATIONS_FAILURE,
+        type: FETCH_LOAN_APPLICATION_BY_ID.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -80,59 +85,6 @@ export const fetchLoanApplicationFromIdThunk = (id, onSuccess, onFailure) => {
     }
   };
 };
-/**
- * Thunk action to search for loan applications based on a keyword and optional status.
- *
- * @function searchLoanApplicationThunk
- * @param {string} search - The search keyword.
- * @param {number} [page=1] - The current page number for pagination.
- * @param {number} [limit=10] - The number of items per page.
- * @param {Function} [onSuccess] - Callback to invoke on successful API response.
- * @param {Function} [onFailure] - Callback to invoke on failed API response.
- * @param {string|null} [status=null] - Optional loan application status to filter results.
- * @returns {Function} Thunk function that dispatches Redux actions.
- */
-export const searchLoanApplicationThunk = (
-  search,
-  page = 1,
-  limit = 10,
-  onSuccess,
-  onFailure,
-  status = null,
-) => {
-  return async dispatch => {
-    dispatch({type: types.SEARCH_LOAN_APPLICATIONS_REQUEST});
-    try {
-      const response = await searchLoanApplicationByKeyword(
-        search,
-        page,
-        limit,
-        status,
-      );
-
-      dispatch({
-        type: types.SEARCH_LOAN_APPLICATIONS_SUCCESS,
-        payload: {
-          data: response.data,
-          message: response.message,
-          success: response.success,
-          page: response.pagination.page,
-          totalPages: response.pagination.totalPages,
-        },
-      });
-
-      onSuccess?.(response);
-    } catch (error) {
-      dispatch({
-        type: types.SEARCH_LOAN_APPLICATIONS_FAILURE,
-        payload: error.message,
-      });
-      showApiErrorToast(error);
-      onFailure?.(error.message);
-    }
-  };
-};
-
 /**
  * Clears the loan application search results from the Redux store.
  *
@@ -140,7 +92,7 @@ export const searchLoanApplicationThunk = (
  * @returns {Object} Redux action to clear the search results.
  */
 export const clearLoanSearch = () => ({
-  type: types.CLEAR_LOAN_SEARCH,
+  type: CLEAR_LOAN_SEARCH,
 });
 
 export const resetLoanApplication = () => ({
