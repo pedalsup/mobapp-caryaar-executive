@@ -35,6 +35,7 @@ import {
   showToast,
 } from '../../utils/helper';
 import Partner_Detail_Component from './Partner_Detail_Component';
+import {Linking, Platform} from 'react-native';
 
 class PartnerDetailScreen extends Component {
   constructor(props) {
@@ -130,6 +131,21 @@ class PartnerDetailScreen extends Component {
     });
   };
 
+  onViewGoogleMapPress = () => {
+    const lat = 23.0225;
+    const lng = 72.5714;
+    const url = Platform.select({
+      ios: `comgooglemaps://?q=${lat},${lng}`,
+      android: `geo:${lat},${lng}?q=${lat},${lng}`,
+    });
+
+    Linking.openURL(url).catch(() => {
+      // fallback to browser
+      const browserUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      Linking.openURL(browserUrl);
+    });
+  };
+
   render() {
     const {selectedPartner} = this.props;
     const {isLoading} = this.state;
@@ -141,13 +157,13 @@ class PartnerDetailScreen extends Component {
         businessName={safeGet(isLoading, selectedPartner, 'businessName')}
         partnerDetail={selectedPartner}
         contactDetails={[
-          {label: 'Owner', value: safeGet(isLoading, owner, 'name')},
+          {label: 'Owner Name', value: safeGet(isLoading, owner, 'name')},
           {
             label: 'Mobile Number',
             value: safeGet(isLoading, owner, 'mobileNumber'),
           },
           {
-            label: 'EmailAddress',
+            label: 'Email Address',
             value: safeGet(isLoading, owner, 'email'),
             full: true,
           },
@@ -223,6 +239,7 @@ class PartnerDetailScreen extends Component {
         ]}
         onEditPartnerDetail={this.onEditPartnerDetail}
         isLoading={isLoading}
+        onViewGoogleMapPress={this.onViewGoogleMapPress}
       />
     );
   }

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 
-import {Alert} from 'react-native';
 import {connect} from 'react-redux';
 import {salesExecOptions} from '../../../constants/enums';
 import {

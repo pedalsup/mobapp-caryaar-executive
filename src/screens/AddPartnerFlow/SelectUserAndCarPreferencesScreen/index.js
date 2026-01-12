@@ -54,16 +54,14 @@ class UserAndCarTypeSelection extends Component {
   render() {
     const {selectedCarType, selectedUserType} = this.state;
     return (
-      <>
-        <User_Car_Type_Selection_Component
-          selectedUserType={selectedUserType}
-          selectedCarType={selectedCarType}
-          onUserTypeSelect={this.onUserTypeSelect}
-          onCarTypeSelect={this.onCarTypeSelect}
-          handleNextPress={this.handleNextPress}
-          onBackPress={this.onBackPress}
-        />
-      </>
+      <User_Car_Type_Selection_Component
+        selectedUserType={selectedUserType}
+        selectedCarType={selectedCarType}
+        onUserTypeSelect={this.onUserTypeSelect}
+        onCarTypeSelect={this.onCarTypeSelect}
+        handleNextPress={this.handleNextPress}
+        onBackPress={this.onBackPress}
+      />
     );
   }
 }

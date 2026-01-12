@@ -34,6 +34,8 @@ let partnerDocuments = [
   partnerDocumentType.BANK_STATEMENT,
   partnerDocumentType.CANCELLED_CHEQUE,
   partnerDocumentType.PHOTOGRAPH,
+  partnerDocumentType.AADHAR_CARD_BACK,
+  partnerDocumentType.AADHAR_CARD_FRONT,
 ];
 
 class AddPartnerRequiredDocument extends Component {
@@ -135,9 +137,10 @@ class AddPartnerRequiredDocument extends Component {
 
     const {selectedPartnerId, isExistingPartner} = this.props;
 
-    // if (!validateRequiredDocuments(documents, requiredFields)) {
-    //   return;
-    // }
+    if (!validateRequiredDocuments(documents, requiredFields)) {
+      return;
+    }
+
     let payload = Object.keys(documents).map(key => ({
       documentType: key,
       documentUrl: documents[key].uploadedUrl,
@@ -147,27 +150,11 @@ class AddPartnerRequiredDocument extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
         {
-          documents: [
-            {
-              documentType: 'SHOP_LICENSE',
-              documentUrl:
-                'SHOP_LICENSE/ebc5b4dd-1acc-4b31-a4fa-4481def30396-1764828624268.pdf',
-            },
-            {
-              documentType: 'GST_REGISTRATION',
-              documentUrl:
-                'GST_REGISTRATION/1f2fa126-60ce-49d5-b6dd-1b221ff79807-1764828630359.png',
-            },
-            {
-              documentType: 'AADHAR_CARD_FRONT',
-              documentUrl:
-                'AADHAR_CARD_FRONT/bd903a00-81e4-4b35-bbd5-0fe9f3e4c9f4-1764828636857.png',
-            },
-          ],
+          documents: payload,
         },
         onSuccess => {
           if (onSuccess?.success) {

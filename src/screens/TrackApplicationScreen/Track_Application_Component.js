@@ -112,7 +112,7 @@ const LoanTrackingScreen = ({
             </ScrollView>
           </Card>
         ) : (
-          <NoDataFound />
+          !loading && <NoDataFound />
         )}
 
         <Spacing size="xl" />

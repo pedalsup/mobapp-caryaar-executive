@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {partnerUserPosition} from '../../../constants/enums';
+import rImages from '../../../assets/images';
 
 const Select_Partner_Role_Component = ({
   onBackPress,
@@ -20,7 +21,7 @@ const Select_Partner_Role_Component = ({
   handleNextPress,
 }) => {
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper backgroundColor={theme.colors.background}>
       <Header title="Add New Partner" onBackPress={onBackPress} />
       <View style={styles.wrapper}>
         <Text>Who are you?</Text>
@@ -40,7 +41,7 @@ const Select_Partner_Role_Component = ({
           <OptionCard
             value={partnerUserPosition.SENIOR_MANAGEMENT}
             label={'Senior Management'}
-            icon={images.userCircle}
+            icon={rImages.ic_management}
             onSelect={onRoleSelect}
             isSelected={selectedRole === partnerUserPosition.SENIOR_MANAGEMENT}
             textProps={{
@@ -54,7 +55,7 @@ const Select_Partner_Role_Component = ({
           <OptionCard
             value={partnerUserPosition.EMPLOYEE}
             label={'Employee'}
-            icon={images.userCircle}
+            icon={rImages.ic_employee}
             onSelect={onRoleSelect}
             isSelected={selectedRole === partnerUserPosition.EMPLOYEE}
             isMedium
@@ -67,7 +68,7 @@ const Select_Partner_Role_Component = ({
           <OptionCard
             value={partnerUserPosition.EMPLOYEE}
             label={'Employee'}
-            icon={images.userCircle}
+            icon={images.ic_employee}
             onSelect={onRoleSelect}
             isSelected={selectedRole === partnerUserPosition.EMPLOYEE}
             isMedium
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
   wrapper: {
     padding: theme.sizes.padding,
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   row: {
     flexDirection: 'row',

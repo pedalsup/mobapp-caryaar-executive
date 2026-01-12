@@ -42,8 +42,9 @@ const Partner_Component = ({
   TAB_OPTIONS,
   totalPages,
   apiTrigger,
+  _activeTab,
 }) => {
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useState(_activeTab);
   const [filteredPartners, setFilteredPartners] = useState([]);
 
   const selectedStatus = activeTab === 'active' ? 'APPROVED' : 'PENDING';
@@ -134,7 +135,7 @@ const Partner_Component = ({
     <SafeAreaWrapper hideBottom>
       <ImageHeader
         subTittle="Partners"
-        searchPlaceHolder="Search by partners name"
+        searchPlaceHolder="Search by partner name..."
         hideProfileIcon
         onRightIconPress={onRightIconPress}
         onFilterPress={onFilterPress}

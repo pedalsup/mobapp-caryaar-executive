@@ -129,20 +129,20 @@ const Home_Component = ({
           <View style={styles.statsContainer}>
             {renderBox(
               partnerStats?.activePartners || '-',
-              '#696EFF',
+              '#1D95F0', //
               'Active\nPartners',
               () => navigateToTab(ScreenNames.Partners),
             )}
             {renderBox(
               partnerStats?.pendingPartners || '-',
               '#F8A902',
-              'Pending\nPartners',
+              'Pending\nApproval',
               () => navigateToTab(ScreenNames.Partners),
             )}
             {renderBox(
-              partnerStats?.totalPartners || '-',
-              '#6EEE87',
-              'Total\nPartners',
+              partnerStats?.totalDeals || '-',
+              '#5FC52E',
+              'Loan\nApproved',
               () => navigateToTab(ScreenNames.Partners),
             )}
             {/* {renderBox(1211, '#696EFF', 'Active Partners', () =>

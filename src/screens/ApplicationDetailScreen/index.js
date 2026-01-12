@@ -171,7 +171,9 @@ class ApplicationDetailScreen extends Component {
     return getTimeDifference(submittedOn, lastUpdatedOn);
   };
 
-  requestDocument = key => showToast('info', `Request ${key}`);
+  requestDocument = key => {
+    // showToast('info', `Request ${key}`);
+  };
 
   onDocumentPress = async (type, link, hasDocument) => {
     if (!hasDocument) {

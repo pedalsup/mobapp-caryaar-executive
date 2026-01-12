@@ -126,6 +126,29 @@ export const updatePartnerThunk = (partnerID, param, onSuccess, onFailure) => {
 
     try {
       const response = await updatePartnerById(param, partnerID);
+
+      const partnerData = response.data;
+
+      const {
+        basicDetails,
+        locationDetails,
+        bankingDetails,
+        sellerType,
+        partnerType,
+        isMultiUser,
+        partnerRole,
+      } = formatPartnerDetails(partnerData);
+
+      dispatch(setSelectedPartner(partnerData));
+      dispatch(setUserType(isMultiUser));
+      dispatch(setPartnerRole(partnerRole));
+      dispatch(setDealershipType(partnerType));
+      dispatch(setSellerType(sellerType));
+      dispatch(setBasicDetails(basicDetails));
+      dispatch(setLocationDetails(locationDetails));
+      dispatch(setBankingDetails(bankingDetails));
+      dispatch(setDocumentDetails(partnerData?.documents));
+
       dispatch({
         type: types.UPDATE_PARTNER_SUCCESS,
         payload: {

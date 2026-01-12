@@ -1,4 +1,3 @@
-import {Loader} from '@caryaar/components';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {getLabelFromEnum, salesExecutiveValue} from '../../constants/enums';
@@ -80,30 +79,25 @@ class ProfileScreen extends Component {
 
   render() {
     const {showLogoutModal} = this.state;
-    const {profileDetail} = this.props;
+    const {profileDetail, loading} = this.props;
 
     return (
-      <>
-        <Profile_Component
-          handleMenuPress={this.handleMenuPress}
-          onRightIconPress={this.onRightIconPress}
-          onEditProfilePress={this.onEditProfilePress}
-          showLogoutModal={showLogoutModal}
-          onPressPrimaryButton={this.onPressPrimaryButton}
-          onModalHide={this.onModalHide}
-          // address={getLocationText()}
-          name={profileDetail?.name}
-          email={profileDetail?.email}
-          phone={removeCountryCode(profileDetail?.mobileNumber)}
-          designation={getLabelFromEnum(
-            salesExecutiveValue,
-            profileDetail?.role,
-          )}
-          avatar={profileDetail?.profileImage}
-          userID={getLabelFromEnum(salesExecutiveValue, profileDetail?.role)}
-        />
-        {this.props.loading && <Loader visible={this.props.loading} />}
-      </>
+      <Profile_Component
+        handleMenuPress={this.handleMenuPress}
+        onRightIconPress={this.onRightIconPress}
+        onEditProfilePress={this.onEditProfilePress}
+        showLogoutModal={showLogoutModal}
+        onPressPrimaryButton={this.onPressPrimaryButton}
+        onModalHide={this.onModalHide}
+        // address={getLocationText()}
+        name={profileDetail?.name}
+        email={profileDetail?.email}
+        phone={removeCountryCode(profileDetail?.mobileNumber)}
+        designation={getLabelFromEnum(salesExecutiveValue, profileDetail?.role)}
+        avatar={profileDetail?.profileImage}
+        userID={profileDetail?.id}
+        loading={loading}
+      />
     );
   }
 }

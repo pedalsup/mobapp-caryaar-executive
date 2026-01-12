@@ -11,6 +11,7 @@ import {
   Text,
   TextAreaInput,
   theme,
+  FullLoader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
@@ -83,7 +84,7 @@ const Application_Detail_Component = ({
           <Spacing size="lg" />
           <DetailInfoCard label={'Documents'} isSemiBold={false}>
             <DocumentList
-              isLoading={isLoading}
+              // isLoading={isLoading}
               documentType={documentType}
               kycDocuments={kycDocuments}
               onDocumentPress={onDocumentPress}
@@ -121,6 +122,7 @@ const Application_Detail_Component = ({
           </View>
         </View>
       </ScrollView>
+      {isLoading && <FullLoader visible={isLoading} />}
       {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );

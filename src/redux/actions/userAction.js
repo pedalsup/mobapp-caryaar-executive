@@ -149,8 +149,8 @@ export const updateProfileThunk = (param, onSuccess, onFailure) => {
       dispatch({
         type: types.UPDATE_USER_SUCCESS,
         payload: {
-          message: response.message,
-          success: response.success,
+          message: response?.message,
+          success: response?.success,
           data: response?.data,
         },
       });

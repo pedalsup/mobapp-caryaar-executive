@@ -9,6 +9,7 @@ import {
   Spacing,
   Text,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {Image, ScrollView, StyleSheet, View} from 'react-native';
@@ -31,6 +32,7 @@ const Profile_Component = ({
   userID,
   avatar,
   designation,
+  loading,
 }) => {
   const version = DeviceInfo.getVersion();
   const build = DeviceInfo.getBuildNumber();
@@ -39,17 +41,19 @@ const Profile_Component = ({
     return (
       <View style={styles.profileCard}>
         <ImageComponent
-          source={avatar == null ? images.placeholder_image : avatar}
+          source={avatar ? avatar : images.placeholder_image}
           style={styles.profilePic}
         />
         {/* <Image source={images.placeholder_image} style={styles.profilePic} /> */}
         <View style={styles.infoSection}>
-          {/* <Text
-            size={'small'}
-            hankenGroteskSemiBold={true}
-            color={theme.colors.primary}>
-            {userID}
-          </Text> */}
+          {userID && (
+            <Text
+              size={'small'}
+              hankenGroteskSemiBold={true}
+              color={theme.colors.primary}>
+              {userID}
+            </Text>
+          )}
           <Text hankenGroteskBold={true} color={theme.colors.white}>
             {name}
           </Text>
@@ -204,6 +208,7 @@ const Profile_Component = ({
           </Text>
         </View>
       </CommonModal>
+      {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );
 };

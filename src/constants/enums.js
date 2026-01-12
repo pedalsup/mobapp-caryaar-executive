@@ -282,7 +282,7 @@ export const dealershipTypeEnum = Object.freeze({
  */
 export const dealershipTypeLabels = {
   [dealershipTypeEnum.OEM]: 'OEM Dealer',
-  [dealershipTypeEnum.MULTI_BRAND]: 'Multi-Brand Deaker',
+  [dealershipTypeEnum.MULTI_BRAND]: 'Multi-Brand Dealer',
   [dealershipTypeEnum.DSA]: 'DSA',
   [dealershipTypeEnum.BROKER]: 'Broker',
 };

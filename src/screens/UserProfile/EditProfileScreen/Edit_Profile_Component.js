@@ -13,11 +13,12 @@ import {
   Text,
   FilePickerModal,
   theme,
+  FullLoader,
+  DropdownModal,
+  Loader,
 } from '@caryaar/components';
 import {goBack} from '../../../navigation/NavigationUtils';
-import SalesExecutiveDropdownModal from '@caryaar/components/src/components/DropdownModal';
 import {salesExecOptions} from '../../../constants/enums';
-import {Loader} from '../../../components';
 
 const Edit_Profile_Component = ({
   handleSavePress,
@@ -36,6 +37,7 @@ const Edit_Profile_Component = ({
   viewProfileImage,
   restInputProps,
   isLoading,
+  isLoadingDocument,
 }) => {
   const [showSalesExecutiveDropdown, setShowSalesExecutiveDropdown] =
     useState(false);
@@ -110,7 +112,7 @@ const Edit_Profile_Component = ({
               keyboardType="email-address"
               returnKeyType="next"
               onSubmitEditing={() => focusNext('mobileNumber')}
-              {...(restInputProps.enail || {})}
+              {...(restInputProps.email || {})}
             />
             <Spacing size="smd" />
             <Input
@@ -134,7 +136,7 @@ const Edit_Profile_Component = ({
               leftIconName={images.businessSuitcase}
               isLeftIconVisible
               isAsDropdown
-              isRightIconVisible
+              isRightIconVisible={false}
               value={salesExecutivePosition}
               onPress={() => setShowSalesExecutiveDropdown(true)}
               {...(restInputProps.salesExecutivePosition || {})}
@@ -147,7 +149,7 @@ const Edit_Profile_Component = ({
         </View>
       </KeyboardAwareScrollView>
 
-      <SalesExecutiveDropdownModal
+      <DropdownModal
         visible={showSalesExecutiveDropdown}
         data={salesExecOptions}
         selectedItem={salesExecutivePosition}
@@ -168,6 +170,8 @@ const Edit_Profile_Component = ({
       />
 
       {isLoading && <Loader visible={isLoading} />}
+
+      {isLoadingDocument && <FullLoader visible={isLoadingDocument} />}
     </SafeAreaWrapper>
   );
 };

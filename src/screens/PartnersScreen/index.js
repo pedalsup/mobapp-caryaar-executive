@@ -27,7 +27,7 @@ class PartnersScreen extends Component {
       isSearch: false,
       apiTrigger: API_TRIGGER.DEFAULT,
     };
-    this.limit = 5; // Pagination limit
+    this.limit = 10; // Pagination limit
   }
 
   componentDidMount() {
@@ -242,6 +242,7 @@ class PartnersScreen extends Component {
         clearSearch={this.clearSearch}
         setSearch={this.searchFromAPI}
         apiTrigger={apiTrigger}
+        _activeTab={this.props.activeTab}
       />
     );
   }
