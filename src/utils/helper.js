@@ -467,3 +467,7 @@ export const getApplicationStatusColor = status => {
 export const safeGet = (loading = false, obj, path, fallback = '-') => {
   return loading ? fallback : get(obj, path, fallback);
 };
+
+// export const removeCountryCode = (number) =>{
+//   return number.startsWith('+91') ? number.slice(3) : number;
+// }

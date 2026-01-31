@@ -10,7 +10,11 @@ import {
   handleFileSelection,
   viewDocumentHelper,
 } from '../../../utils/documentUtils';
-import {showApiErrorToast, showToast} from '../../../utils/helper';
+import {
+  removeCountryCode,
+  showApiErrorToast,
+  showToast,
+} from '../../../utils/helper';
 import Edit_Profile_Component from './Edit_Profile_Component';
 import {validateField, handleFieldChange} from '../../../utils/inputHelper';
 import {uploadApplicantPhoto} from '../../../utils/fileUploadUtils';
@@ -199,7 +203,7 @@ class EditProfileScreen extends Component {
             autoCapitalize: 'words',
           },
           mobileNumber: {
-            value: mobileNumber,
+            value: removeCountryCode(mobileNumber),
             isError: errors.mobileNumber,
             statusMsg: errors.mobileNumber,
           },

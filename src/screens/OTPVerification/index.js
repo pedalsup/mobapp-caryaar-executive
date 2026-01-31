@@ -88,7 +88,7 @@ class OTPVerification extends Component {
     }
 
     const param = {
-      mobileNumber: phone,
+      mobileNumber: `+91${phone}`,
       otp: otp,
     };
 
