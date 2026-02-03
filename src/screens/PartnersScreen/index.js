@@ -28,10 +28,43 @@ class PartnersScreen extends Component {
       apiTrigger: API_TRIGGER.DEFAULT,
     };
     this.limit = 10; // Pagination limit
+    this.lastFetchedTab = null;
   }
 
   componentDidMount() {
-    this.fetchPartnersByTab(1);
+    this.focusListener = this.props.navigation.addListener('focus', () => {
+      const {activeTab, activePartners, pendingPartners} = this.props;
+      console.log({
+        activeTab: 'activeTab',
+        lastFetchedTab: this.lastFetchedTab,
+      });
+      if (this.lastFetchedTab === activeTab) {
+        return;
+      }
+      this.lastFetchedTab = activeTab;
+      const hasData =
+        activeTab === PARTNER_TAB_OPTIONS[0]
+          ? activePartners?.length
+          : pendingPartners?.length;
+
+      if (hasData) {
+        return;
+      }
+
+      this.fetchPartnersByTab(1);
+    });
+    // this.fetchPartnersByTab(1);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.activeTab !== this.props.activeTab) {
+      this.lastFetchedTab = this.props.activeTab;
+      this.fetchPartnersByTab(1);
+    }
+  }
+
+  componentWillUnmount() {
+    this.focusListener?.();
   }
 
   /* ----------------------------- Helpers ----------------------------- */
@@ -80,6 +113,11 @@ class PartnersScreen extends Component {
   /* ----------------------------- Events ----------------------------- */
 
   onTabPress = activeTab => {
+    if (this.props.activeTab === activeTab) {
+      return; // 👈 prevent refetch if same tab clicked
+    }
+    this.lastFetchedTab = activeTab;
+
     this.props.setPartnerActiveTab(activeTab);
     this.setState({isSearch: false, searchText: ''}, () => {
       this.props.clearSearchResults();

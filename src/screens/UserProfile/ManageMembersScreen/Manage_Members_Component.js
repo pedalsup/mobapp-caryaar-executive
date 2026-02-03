@@ -37,7 +37,6 @@ import {getLabelFromEnum, salesExecutiveValue} from '../../../constants/enums';
 import {goBack} from '../../../navigation/NavigationUtils';
 import {formatMobileNumber} from '../../../utils/helper';
 import strings from '../../../locales/strings';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useInputRefs} from '../../../utils/useInputRefs';
 
 const Manage_Members_Component = ({

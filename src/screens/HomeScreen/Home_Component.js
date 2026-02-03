@@ -26,6 +26,9 @@ const Home_Component = ({
   onRefresh,
   refreshing,
   partnerStats,
+  onActivePartnerPress,
+  onPendingApprovalPress,
+  onLoanApprovedPress,
 }) => {
   const getTrendIcon = value =>
     value > 0 ? images.up_trend : value < 0 ? images.down_trend : null;
@@ -131,19 +134,19 @@ const Home_Component = ({
               partnerStats?.activePartners || '-',
               '#1D95F0', //
               'Active\nPartners',
-              () => navigateToTab(ScreenNames.Partners),
+              onActivePartnerPress,
             )}
             {renderBox(
               partnerStats?.pendingPartners || '-',
               '#F8A902',
               'Pending\nApproval',
-              () => navigateToTab(ScreenNames.Partners),
+              onPendingApprovalPress,
             )}
             {renderBox(
               partnerStats?.totalDeals || '-',
               '#5FC52E',
               'Loan\nApproved',
-              () => navigateToTab(ScreenNames.Partners),
+              onLoanApprovedPress,
             )}
             {/* {renderBox(1211, '#696EFF', 'Active Partners', () =>
               navigateToTab(ScreenNames.Partners),

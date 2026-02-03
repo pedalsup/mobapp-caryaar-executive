@@ -132,7 +132,7 @@ class AddPartnerBusinessLocation extends Component {
       pincode: pincode,
       latitude: 19.076,
       longitude: 72.877,
-      city: 'Mumbai',
+      city: '',
     };
 
     // Common navigation params
@@ -239,7 +239,7 @@ class AddPartnerBusinessLocation extends Component {
             value: pincode,
             isError: errors.pincode,
             statusMsg: errors.pincode,
-            rightLabel: cityName,
+            rightLabel: '', //cityName
             rightLabelPress: () => {},
             keyboardType: 'numeric',
             returnKeyType: 'done',
