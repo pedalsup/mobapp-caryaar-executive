@@ -245,7 +245,7 @@ const Manage_Members_Component = ({
         </KeyboardAvoidingView>
       </CommonModal>
       <View style={styles.buttonWrapper}>
-        <Button label={'Send Invite'} onPress={handleAddNewMemberPress} />
+        <Button label={'Add New Member'} onPress={handleAddNewMemberPress} />
       </View>
 
       <DeleteConfirmationContent

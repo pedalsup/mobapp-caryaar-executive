@@ -66,7 +66,7 @@ class EditProfileScreen extends Component {
     this.props.updateProfileThunk(
       param,
       success => {
-        // goBack();
+        goBack();
       },
       error => {},
     );

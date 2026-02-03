@@ -345,6 +345,12 @@ class AddPartnersBankDetail extends Component {
     );
   };
 
+  onIFSCCodeChange = text => {
+    const upper = text.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    this.handleInputChange('ifscCode', upper);
+    this.handleInputChange('branchName', '');
+  };
+
   render() {
     const {
       selectedTransferMode,
@@ -373,10 +379,7 @@ class AddPartnersBankDetail extends Component {
             this.handleInputChange('accountHolderName', value)
           }
           onBankNamePress={value => this.handleInputChange('bankName', value)}
-          onIFSCCodeChange={value => {
-            this.handleInputChange('ifscCode', value.toUpperCase());
-            this.handleInputChange('branchName', '');
-          }}
+          onIFSCCodeChange={this.onIFSCCodeChange}
           onSelectBank={this.onSelectBank}
           restInputProps={{
             accountNumber: {
@@ -396,6 +399,9 @@ class AddPartnersBankDetail extends Component {
               rightLabel: 'VERIFY',
               rightLabelColor: theme.colors.primary,
               rightLabelPress: this.verifyBankDetailsByIFSC,
+              autoCapitalize: 'characters',
+              autoCorrect: false,
+              autoComplete: 'off',
             },
             bankName: {
               value: bankName,

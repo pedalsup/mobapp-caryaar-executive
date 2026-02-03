@@ -59,31 +59,32 @@ class AddPartnerRequiredDocument extends Component {
 
     const formattedDocs = {};
 
+    console.log('documentDetails', documentDetails);
+
     if (fromScreen) {
-      const formattedDocuments = await transformPartnerDocumentData(
-        documentDetails,
-        partnerDocuments,
-      );
-
-      let detail = await this.convertFormattedToDetails(formattedDocuments);
-
-      detail?.forEach(doc => {
-        formattedDocs[doc.documentType] = {
-          uri: doc.documentUrl,
-          isLocal: false,
-          type: null,
-          fileSize: null,
-          uploadedUrl: doc.documentUrl,
-          ...doc,
-        };
-      });
-
       this.setState({
-        fromScreen,
         showImages: get(navState, 'showImages', []),
         errorSteps: get(navState, 'errorSteps', []),
       });
     }
+
+    const formattedDocuments = await transformPartnerDocumentData(
+      documentDetails,
+      partnerDocuments,
+    );
+
+    let detail = await this.convertFormattedToDetails(formattedDocuments);
+
+    detail?.forEach(doc => {
+      formattedDocs[doc.documentType] = {
+        uri: doc.documentUrl,
+        isLocal: false,
+        type: null,
+        fileSize: null,
+        uploadedUrl: doc.documentUrl,
+        ...doc,
+      };
+    });
 
     this.setState({
       fromScreen,

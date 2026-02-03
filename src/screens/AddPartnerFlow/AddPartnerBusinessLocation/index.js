@@ -50,6 +50,7 @@ class AddPartnerBusinessLocation extends Component {
         errorSteps: get(navState, 'errorSteps', []),
       });
     }
+
     this.setState({
       fromScreen: fromScreen,
       companyName: get(locationDetails, 'companyName', ''),
@@ -59,7 +60,7 @@ class AddPartnerBusinessLocation extends Component {
       area: get(locationDetails, 'area', ''),
       stateName: get(locationDetails, 'state', ''),
       pincode: get(locationDetails, 'pincode', ''),
-      cityName: get(locationDetails, 'city', ''),
+      cityName: get(locationDetails, 'city', 'XXX'),
     });
   }
 
@@ -76,7 +77,7 @@ class AddPartnerBusinessLocation extends Component {
       'area',
       'stateName',
       'pincode',
-      'cityName',
+      // 'cityName',
     ];
 
     const errors = {};
