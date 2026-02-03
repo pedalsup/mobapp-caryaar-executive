@@ -34,10 +34,7 @@ class PartnersScreen extends Component {
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener('focus', () => {
       const {activeTab, activePartners, pendingPartners} = this.props;
-      console.log({
-        activeTab: 'activeTab',
-        lastFetchedTab: this.lastFetchedTab,
-      });
+
       if (this.lastFetchedTab === activeTab) {
         return;
       }

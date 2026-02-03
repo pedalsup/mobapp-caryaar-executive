@@ -59,8 +59,6 @@ class AddPartnerRequiredDocument extends Component {
 
     const formattedDocs = {};
 
-    console.log('documentDetails', documentDetails);
-
     if (fromScreen) {
       this.setState({
         showImages: get(navState, 'showImages', []),
