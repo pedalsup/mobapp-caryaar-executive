@@ -1,14 +1,20 @@
-import types from './types';
-import {showApiErrorToast} from '../../utils/helper';
+import moment from 'moment';
 import {
   createPartner,
   fetchPartnerById,
-  fetchPartnersByStatus,
-  searchPartnersByKeyword,
+  fetchPartners,
   updatePartnerById,
 } from '../../services';
-import moment from 'moment';
+import {showApiErrorToast} from '../../utils/helper';
 import {formatPartnerDetails} from '../../utils/partnerHelpers';
+import {
+  CLEAR_SEARCH_RESULTS,
+  CREATE_PARTNER,
+  FETCH_PARTNER_BY_ID,
+  FETCH_PARTNERS,
+  SET_IS_EXISTING_PARTNER,
+  SET_PARTNER_ACTIVE_TAB,
+} from './actionType';
 import {
   setBankingDetails,
   setBasicDetails,
@@ -19,7 +25,7 @@ import {
   setSellerType,
   setUserType,
 } from './partnerFormActions';
-import {SET_IS_EXISTING_PARTNER} from './actionType';
+import types from './types';
 
 /**
  * Thunk to fetch a specific partner's details by ID.
@@ -30,7 +36,7 @@ import {SET_IS_EXISTING_PARTNER} from './actionType';
  */
 export const fetchPartnerFromId = (partnerId, onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.FETCH_PARTNER_REQUEST});
+    dispatch({type: FETCH_PARTNER_BY_ID.REQUEST});
 
     try {
       const response = await fetchPartnerById(partnerId);
@@ -59,7 +65,7 @@ export const fetchPartnerFromId = (partnerId, onSuccess, onFailure) => {
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.FETCH_PARTNER_FAILURE,
+        type: FETCH_PARTNER_BY_ID.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -77,12 +83,12 @@ export const fetchPartnerFromId = (partnerId, onSuccess, onFailure) => {
  */
 export const createPartnerThunk = (param, onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.CREATE_PARTNER_REQUEST});
+    dispatch({type: CREATE_PARTNER.REQUEST});
 
     try {
       const response = await createPartner(param);
       dispatch({
-        type: types.CREATE_PARTNER_SUCCESS,
+        type: CREATE_PARTNER.SUCCESS,
         payload: {
           data: {
             id: response.data?.partnerId,
@@ -97,7 +103,7 @@ export const createPartnerThunk = (param, onSuccess, onFailure) => {
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.CREATE_PARTNER_FAILURE,
+        type: CREATE_PARTNER.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -120,6 +126,29 @@ export const updatePartnerThunk = (partnerID, param, onSuccess, onFailure) => {
 
     try {
       const response = await updatePartnerById(param, partnerID);
+
+      const partnerData = response.data;
+
+      const {
+        basicDetails,
+        locationDetails,
+        bankingDetails,
+        sellerType,
+        partnerType,
+        isMultiUser,
+        partnerRole,
+      } = formatPartnerDetails(partnerData);
+
+      dispatch(setSelectedPartner(partnerData));
+      dispatch(setUserType(isMultiUser));
+      dispatch(setPartnerRole(partnerRole));
+      dispatch(setDealershipType(partnerType));
+      dispatch(setSellerType(sellerType));
+      dispatch(setBasicDetails(basicDetails));
+      dispatch(setLocationDetails(locationDetails));
+      dispatch(setBankingDetails(bankingDetails));
+      dispatch(setDocumentDetails(partnerData?.documents));
+
       dispatch({
         type: types.UPDATE_PARTNER_SUCCESS,
         payload: {
@@ -141,126 +170,43 @@ export const updatePartnerThunk = (partnerID, param, onSuccess, onFailure) => {
   };
 };
 
-/**
- * Redux Thunk action to search partners by keyword.
- *
- * @param {string} search - The search term to query partners.
- * @param {function} [onSuccess] - Callback fired on successful API response.
- * @param {function} [onFailure] - Callback fired on API error.
- */
-export const searchPartnersThunk = (
-  search,
+export const fetchPartnersThunk = (
   page = 1,
   limit = 10,
+  payload = {},
   onSuccess,
   onFailure,
-  status = null,
 ) => {
-  return async dispatch => {
-    dispatch({type: types.SEARCH_PARTNER_REQUEST});
+  return async (dispatch, getState) => {
+    dispatch({type: FETCH_PARTNERS.REQUEST});
+
+    const safePayload = {
+      params: payload?.params ?? {},
+    };
+
     try {
-      const response = await searchPartnersByKeyword(
-        search,
-        page,
-        limit,
-        status,
-      );
+      const response = await fetchPartners(page, limit, safePayload);
+
+      const isSearch = !!safePayload.params.search;
+      const isPending = safePayload.params.onboardingStatus === 'PENDING';
 
       dispatch({
-        type: types.SEARCH_PARTNER_SUCCESS,
+        type: FETCH_PARTNERS.SUCCESS,
         payload: {
-          data: response.data,
-          message: response.message,
-          success: response.success,
-          page: response.pagination.page,
-          totalPages: response.pagination.totalPages,
+          applications: response?.data ?? [],
+          pagination: response?.pagination ?? {},
+          isSearch,
+          isPending,
         },
       });
-
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.SEARCH_PARTNER_FAILURE,
-        payload: error.message,
+        type: FETCH_PARTNERS.FAILURE,
+        error: error.message,
       });
       showApiErrorToast(error);
       onFailure?.(error.message);
-    }
-  };
-};
-
-/**
- * Thunk to fetch partners with 'APPROVED' status (active partners).
- *
- * @function fetchActivePartners
- * @param {number} [page=1] - Page number for pagination.
- * @param {number} [limit=10] - Number of records per page.
- * @param {Function} [onSuccess] - Callback to execute on successful fetch.
- * @param {Function} [onFailure] - Callback to execute on failure.
- * @returns {Function} Redux thunk function.
- */
-export const fetchActivePartners = (
-  page = 1,
-  limit = 10,
-  onSuccess,
-  onFailure,
-) => {
-  return async dispatch => {
-    dispatch({type: types.FETCH_ACTIVE_PARTNERS_REQUEST});
-
-    try {
-      const response = await fetchPartnersByStatus('APPROVED', page, limit);
-      dispatch({
-        type: types.FETCH_ACTIVE_PARTNERS_SUCCESS,
-        payload: {
-          data: response.data,
-          page: response.pagination.page,
-          totalPages: response.pagination.totalPages,
-        },
-      });
-      onSuccess?.(response);
-    } catch (error) {
-      dispatch({type: types.FETCH_ACTIVE_PARTNERS_FAILURE});
-      onFailure?.(error);
-      showApiErrorToast(error);
-    }
-  };
-};
-
-/**
- * Thunk to fetch partners with 'PENDING' status.
- *
- * @function fetchPendingPartners
- * @param {number} [page=1] - Page number for pagination.
- * @param {number} [limit=10] - Number of records per page.
- * @param {Function} [onSuccess] - Callback to execute on successful fetch.
- * @param {Function} [onFailure] - Callback to execute on failure.
- * @returns {Function} Redux thunk function.
- */
-export const fetchPendingPartners = (
-  page = 1,
-  limit = 10,
-  onSuccess,
-  onFailure,
-) => {
-  return async dispatch => {
-    dispatch({type: types.FETCH_PENDING_PARTNERS_REQUEST});
-
-    try {
-      const response = await fetchPartnersByStatus('PENDING', page, limit);
-      dispatch({
-        type: types.FETCH_PENDING_PARTNERS_SUCCESS,
-        payload: {
-          data: response.data,
-          page: response.pagination.page,
-          totalPages: response.pagination.totalPages,
-        },
-      });
-      onSuccess?.(response);
-    } catch (error) {
-      dispatch({type: types.FETCH_PENDING_PARTNERS_FAILURE});
-      onFailure?.(error);
-      showApiErrorToast(error);
     }
   };
 };
@@ -273,10 +219,10 @@ export const fetchPendingPartners = (
  * that was previously stored in the search results state.
  *
  * @returns {Object} The action object to be dispatched.
- * @property {string} type - The action type, which will be `CLEAR_SEARCH_PARTNERS`.
+ * @property {string} type - The action type, which will be `CLEAR_SEARCH_RESULTS.SUCCESS`.
  */
 export const clearSearchResults = () => ({
-  type: types.CLEAR_SEARCH_PARTNERS,
+  type: CLEAR_SEARCH_RESULTS.SUCCESS,
 });
 
 /**
@@ -284,10 +230,10 @@ export const clearSearchResults = () => ({
  *
  * @function
  * @param {Object} partnerData - The partner object to store.
- * @returns {Object} Redux action with type `FETCH_PARTNER_SUCCESS` and the provided partner data as payload.
+ * @returns {Object} Redux action with type `FETCH_PARTNER_BY_ID.SUCCESS` and the provided partner data as payload.
  */
 export const setSelectedPartner = partnerData => ({
-  type: types.FETCH_PARTNER_SUCCESS,
+  type: FETCH_PARTNER_BY_ID.SUCCESS,
   payload: partnerData,
 });
 
@@ -305,4 +251,9 @@ export const resetPartnerDetail = () => ({
 export const setIsExistingPartner = isExisting => ({
   type: SET_IS_EXISTING_PARTNER.SUCCESS,
   payload: isExisting,
+});
+
+export const setPartnerActiveTab = activeTab => ({
+  type: SET_PARTNER_ACTIVE_TAB.SUCCESS,
+  payload: activeTab,
 });

@@ -7,18 +7,18 @@ import {
   Text,
   images,
   theme,
+  Loader,
+  PaginationFooter,
 } from '@caryaar/components';
 import React, {useEffect, useState} from 'react';
 import {FlatList, Pressable, StyleSheet, View} from 'react-native';
-import {Loader, NoDataFound, PaginationFooter} from '../../components';
+import {NoDataFound} from '../../components';
 import {partnerDocumentLabelMap} from '../../constants/enums';
 import {
   formatDate,
   getLocationText,
   removeCountryCode,
 } from '../../utils/helper';
-
-const limit = 10;
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -42,8 +42,9 @@ const Partner_Component = ({
   TAB_OPTIONS,
   totalPages,
   apiTrigger,
+  _activeTab,
 }) => {
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useState(_activeTab);
   const [filteredPartners, setFilteredPartners] = useState([]);
 
   const selectedStatus = activeTab === 'active' ? 'APPROVED' : 'PENDING';
@@ -134,7 +135,7 @@ const Partner_Component = ({
     <SafeAreaWrapper hideBottom>
       <ImageHeader
         subTittle="Partners"
-        searchPlaceHolder="Search by partners name"
+        searchPlaceHolder="Search by partner name..."
         hideProfileIcon
         onRightIconPress={onRightIconPress}
         onFilterPress={onFilterPress}
@@ -170,7 +171,7 @@ const Partner_Component = ({
             loading={loading}
             currentPage={currentPage}
             totalPages={totalPages}
-            footerMessage={'All Partners are loaded.'}
+            footerMessage={'You’ve reached the end!'}
             minTotalPagesToShowMessage={1}
           />
         }

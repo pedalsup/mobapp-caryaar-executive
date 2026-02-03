@@ -33,14 +33,12 @@ class SelectPartnerRole extends Component {
   render() {
     const {selectedRole} = this.state;
     return (
-      <>
-        <Select_Partner_Role_Component
-          onRoleSelect={this.onRoleSelect}
-          selectedRole={selectedRole}
-          onBackPress={this.onBackPress}
-          handleNextPress={this.handleNextPress}
-        />
-      </>
+      <Select_Partner_Role_Component
+        onRoleSelect={this.onRoleSelect}
+        selectedRole={selectedRole}
+        onBackPress={this.onBackPress}
+        handleNextPress={this.handleNextPress}
+      />
     );
   }
 }

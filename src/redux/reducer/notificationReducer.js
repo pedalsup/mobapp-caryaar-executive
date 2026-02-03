@@ -1,4 +1,9 @@
 import {types} from '../actions';
+import {
+  CLEAR_LOAN_SEARCH,
+  FETCH_NOTIFICATIONS,
+  MARK_ALL_NOTIFICATIONS_READ,
+} from '../actions/actionType';
 
 const initialState = {
   loading: false,
@@ -7,27 +12,34 @@ const initialState = {
 
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
-    case types.NOTIFICATIONS_REQUEST:
+    case FETCH_NOTIFICATIONS.REQUEST:
+    case MARK_ALL_NOTIFICATIONS_READ.REQUEST:
       return {
         ...state,
         loading: true,
       };
 
-    case types.NOTIFICATIONS_SUCCESS:
+    case FETCH_NOTIFICATIONS.SUCCESS:
       return {
         ...state,
         loading: false,
         notifications: action.payload,
       };
 
-    case types.NOTIFICATIONS_FAILURE:
-    case types.NOTIFICATION_MARK_ALL_READ:
+    case MARK_ALL_NOTIFICATIONS_READ.SUCCESS:
       return {
         ...state,
         loading: false,
       };
 
-    case types.CLEAR_LOAN_SEARCH:
+    case FETCH_NOTIFICATIONS.FAILURE:
+    case MARK_ALL_NOTIFICATIONS_READ.FAILURE:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case CLEAR_LOAN_SEARCH:
     case types.RESET_APP_STATE:
       return {...initialState};
 

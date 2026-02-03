@@ -7,11 +7,13 @@ import {
   documentImageLabelMap,
   documentImageType,
   documentType,
+  occupationType,
   partnerDocumentLabelMap,
 } from '../constants/enums';
 import {getPresignedDownloadUrl} from '../services';
 import {showToast} from './helper';
 import {compressImage} from './fileUploadUtils';
+import {loan_document_requirements} from '../constants/loan_document_requirements';
 
 /**
  * Launches a file picker based on type: camera, gallery, or document.
@@ -318,7 +320,7 @@ export const validateRequiredDocuments = (documents, requiredFields) => {
 
   if (missingFields.length > 0) {
     const missingLabels = missingFields
-      .map(field => documentImageLabelMap?.[field] || field)
+      .map(field => partnerDocumentLabelMap?.[field] || field)
       .join(', ');
     showToast('error', `Please upload: ${missingLabels}`, 'bottom', 3500);
     return false;
@@ -379,8 +381,6 @@ export const getMimeFromUrl = url => {
 export const transformDocumentData = async (responseData, documentKey = []) => {
   const formattedData = {};
 
-  console.log({responseData});
-
   const fileKeys = Object.keys(responseData).filter(
     key =>
       documentKey.includes(key) &&
@@ -388,14 +388,11 @@ export const transformDocumentData = async (responseData, documentKey = []) => {
       typeof responseData[key] === 'string',
   );
 
-  console.log({fileKeys});
-
   for (const key of fileKeys) {
     const uri = responseData[key];
     const acceptedDocType = responseData[documentType[key]];
     try {
       const {data} = await getPresignedDownloadUrl({objectKey: uri});
-      console.log({data});
       formattedData[key] = {
         uploadKey: uri,
         uploadedUrl: uri,
@@ -404,7 +401,6 @@ export const transformDocumentData = async (responseData, documentKey = []) => {
         selectedDocType: acceptedDocType,
       };
     } catch (error) {
-      console.error(`Failed to get presigned URL for ${key}`, error);
       formattedData[key] = {
         uploadKey: uri,
         uploadedUrl: uri,
@@ -493,6 +489,24 @@ export const getDocumentLink = async uri => {
  * @param {(type: string, url?: string) => void} onPressHandler - Callback when item is pressed.
  * @returns {Array} - List of document objects.
  */
+// export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
+//   const allDocTypes = Object.keys(partnerDocumentLabelMap);
+//   const uploadedDocs = partnerDetail?.documents || [];
+//   const missingDocs = partnerDetail?.missingDocuments || [];
+
+//   return allDocTypes.map(type => {
+//     const uploadedDoc = findUploadedDoc(type, uploadedDocs);
+//     return {
+//       label: partnerDocumentLabelMap[type],
+//       documentType: type,
+//       uploaded: !!uploadedDoc,
+//       isMissing: missingDocs.includes(type),
+//       ...uploadedDoc,
+//       onPress: () => onPressHandler(type, uploadedDoc?.documentUrl),
+//     };
+//   });
+// };
+
 export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
   const allDocTypes = Object.keys(partnerDocumentLabelMap);
   const uploadedDocs = partnerDetail?.documents || [];
@@ -500,13 +514,17 @@ export const buildDocumentsArray = (partnerDetail, onPressHandler) => {
 
   return allDocTypes.map(type => {
     const uploadedDoc = findUploadedDoc(type, uploadedDocs);
+    const uploaded = !!uploadedDoc;
+    const isMissing = missingDocs.includes(type);
+
     return {
       label: partnerDocumentLabelMap[type],
       documentType: type,
-      uploaded: !!uploadedDoc,
-      isMissing: missingDocs.includes(type),
+      uploaded,
+      isMissing,
       ...uploadedDoc,
-      onPress: () => onPressHandler(type, uploadedDoc?.documentUrl),
+      onPress: () =>
+        onPressHandler(type, uploadedDoc?.documentUrl, isMissing || !uploaded),
     };
   });
 };
@@ -552,7 +570,7 @@ export const transformPartnerDocumentData = async (
       formattedData[key] = {
         uploadKey: uri,
         uploadedUrl: uri,
-        uri: data?.url || uri,
+        uri: data?.url || null,
         isLocal: false,
         selectedDocType: key,
         ...doc,
@@ -573,4 +591,34 @@ export const transformPartnerDocumentData = async (
   }
 
   return formattedData;
+};
+
+export const getDocumentRequirements = (
+  loanProduct,
+  typeOfIndividual,
+  orderList,
+) => {
+  if (!loanProduct || !typeOfIndividual) {
+    return orderList;
+  }
+
+  if (typeOfIndividual === occupationType.OTHER) {
+    return orderList;
+  }
+
+  // Step 1: Get matching items
+  const filtered = loan_document_requirements.filter(
+    item =>
+      item.loanProduct === loanProduct &&
+      item.typeOfIndividual === typeOfIndividual,
+  );
+
+  const _types = filtered.map(item => item.documentType);
+
+  // Step 3: Sort based on your enum order
+  const order = Object.values(documentImageType);
+
+  const sorted = _types.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+  return sorted;
 };

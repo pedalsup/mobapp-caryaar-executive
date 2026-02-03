@@ -9,7 +9,8 @@ export const validateField = (key, value, isOptional) => {
   const numericRegex = /^[0-9]+(\.[0-9]+)?$/;
   const integerRegex = /^[0-9]+$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const mobileNumberRegex = /^[0-9]{10}$/;
+  // const mobileNumberRegex = /^[0-9]{10}$/;
+  const mobileNumberRegex = /^(?:\+91|91)?[0-9]{10}$/;
   const pincodeRegex = /^[0-9]{6}$/;
   const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
   const accountNumberRegex = /^[0-9]{9,18}$/;

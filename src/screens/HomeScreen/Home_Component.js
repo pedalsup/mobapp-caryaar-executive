@@ -9,10 +9,11 @@ import {
   Spacing,
   Text,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {FlatList, Image, View} from 'react-native';
-import {InitialsAvatar, Loader, NoDataFound} from '../../components';
+import {InitialsAvatar, NoDataFound} from '../../components';
 import ScreenNames from '../../constants/ScreenNames';
 import {navigateToTab} from '../../navigation/NavigationUtils';
 import {styles} from '../../styles/Home.style';
@@ -25,6 +26,9 @@ const Home_Component = ({
   onRefresh,
   refreshing,
   partnerStats,
+  onActivePartnerPress,
+  onPendingApprovalPress,
+  onLoanApprovedPress,
 }) => {
   const getTrendIcon = value =>
     value > 0 ? images.up_trend : value < 0 ? images.down_trend : null;
@@ -128,21 +132,21 @@ const Home_Component = ({
           <View style={styles.statsContainer}>
             {renderBox(
               partnerStats?.activePartners || '-',
-              '#696EFF',
+              '#1D95F0', //
               'Active\nPartners',
-              () => navigateToTab(ScreenNames.Partners),
+              onActivePartnerPress,
             )}
             {renderBox(
               partnerStats?.pendingPartners || '-',
               '#F8A902',
-              'Pending\nPartners',
-              () => navigateToTab(ScreenNames.Partners),
+              'Pending\nApproval',
+              onPendingApprovalPress,
             )}
             {renderBox(
-              partnerStats?.totalPartners || '-',
-              '#6EEE87',
-              'Total\nPartners',
-              () => navigateToTab(ScreenNames.Partners),
+              partnerStats?.totalDeals || '-',
+              '#5FC52E',
+              'Loan\nApproved',
+              onLoanApprovedPress,
             )}
             {/* {renderBox(1211, '#696EFF', 'Active Partners', () =>
               navigateToTab(ScreenNames.Partners),

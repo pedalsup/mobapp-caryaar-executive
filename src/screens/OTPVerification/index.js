@@ -10,7 +10,7 @@ import {
 import {setAccessToken, setLoginStatus} from '../../utils/storage';
 import OTP_Verification_Component from './OTP_Verification_Component';
 import {formatMobileNumber, showToast} from '../../utils/helper';
-import {Loader} from '../../components';
+import {Loader} from '@caryaar/components';
 const timerValue = 30;
 
 class OTPVerification extends Component {
@@ -88,7 +88,7 @@ class OTPVerification extends Component {
     }
 
     const param = {
-      mobileNumber: phone,
+      mobileNumber: `+91${phone}`,
       otp: otp,
     };
 

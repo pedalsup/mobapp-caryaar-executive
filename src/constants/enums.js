@@ -282,7 +282,7 @@ export const dealershipTypeEnum = Object.freeze({
  */
 export const dealershipTypeLabels = {
   [dealershipTypeEnum.OEM]: 'OEM Dealer',
-  [dealershipTypeEnum.MULTI_BRAND]: 'Multi-Brand Deaker',
+  [dealershipTypeEnum.MULTI_BRAND]: 'Multi-Brand Dealer',
   [dealershipTypeEnum.DSA]: 'DSA',
   [dealershipTypeEnum.BROKER]: 'Broker',
 };
@@ -294,10 +294,11 @@ export const dealershipTypeLabels = {
  */
 export const applicationStatus = Object.freeze({
   APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED',
-  PENDING: 'PENDING',
-  QUERY: 'QUERY',
   IN_REVIEW: 'IN_REVIEW',
+  QUERY: 'QUERY',
+  REJECTED: 'REJECTED',
+  DRAFT: 'DRAFT',
+  DISBURSED: 'DISBURSED',
 });
 
 /**
@@ -305,10 +306,11 @@ export const applicationStatus = Object.freeze({
  */
 export const applicationStatusOptions = [
   {id: '1', label: 'Approved', value: applicationStatus.APPROVED},
+  {id: '3', label: 'Draft', value: applicationStatus.DRAFT},
   {id: '2', label: 'Rejected', value: applicationStatus.REJECTED},
-  {id: '3', label: 'Pending', value: applicationStatus.PENDING},
   {id: '4', label: 'Query', value: applicationStatus.QUERY},
   {id: '5', label: 'In Review', value: applicationStatus.IN_REVIEW},
+  {id: '6', label: 'Disbursed', value: applicationStatus.DISBURSED},
 ];
 
 /**
@@ -317,9 +319,10 @@ export const applicationStatusOptions = [
 export const applicationStatusValue = {
   [applicationStatus.APPROVED]: 'Approved',
   [applicationStatus.REJECTED]: 'Rejected',
-  [applicationStatus.PENDING]: 'Pending',
   [applicationStatus.QUERY]: 'Query',
   [applicationStatus.IN_REVIEW]: 'In Review',
+  [applicationStatus.DRAFT]: 'Draft',
+  [applicationStatus.DISBURSED]: 'Disbursed',
 };
 
 export const getApplicationStatusLabel = status => {
@@ -343,16 +346,17 @@ export const currentLoanOptions = Object.freeze({
   no: 'no',
 });
 
-export const loanType = Object.freeze({
-  purchase: 1,
-  refinance: 2,
-  topUp: 3,
-  internalBT: 4,
-  externalBT: 5,
-  loan: 6,
+export const loanType = {
+  addVehicle: 9,
+  externalBT: 'EXTERNAL_BALANCE_TRANSFER',
+  internalBT: 'INTERNAL_BALACE_TRANSFER',
   lease: 7,
+  loan: 6,
+  purchase: 'OLD_CAR_SALE_PURCHASE',
+  refinance: 'REFINANCE',
   subscribe: 8,
-});
+  topUp: 'TOP_UP',
+};
 
 export const eVehicleStatus = Object.freeze({
   INVENTORY: 'inventory',
@@ -432,8 +436,87 @@ export const DOCUMENT_LABELS = {
   // passportImage: 'Passport',
 };
 
+export const documentImageType = Object.freeze({
+  ID_PROOF: 'idProofImage',
+  ADDRESS_PROOF: 'addressProofImage',
+  PERMANENT_ADDRESS: 'permanentAddressImage',
+  INCOME_PROOF: 'incomeProofImage',
+  BANKING_PROOF: 'bankingProofImage',
+  BUSINESS_PROOF: 'businessProofImage',
+  INSURANCE: 'insuranceImage',
+  APPLICATION_FORM: 'applicationFormImage',
+  CO_APPLICANT: 'coapplicantImage',
+  PASSPORT: 'passportImage',
+  OTHER_DOCUMENTS: 'otherDocuments',
+  SOA: 'soa',
+  SANCTION_LETTER: 'sanctionLetter',
+  NOC: 'noc',
+  FORM_34: 'form34',
+  PASSPORT_SIZE_PHOTO: 'passportImage',
+  CO_APPLICANT_DOCUMENTS: 'coapplicantImage',
+  SPECIAL_DOCUMENTS: 'specialDocuments',
+});
+
+export const documentImageLabelMap = {
+  [documentImageType.ADDRESS_PROOF]: 'Address Proof',
+  [documentImageType.APPLICATION_FORM]: 'Application Form',
+  [documentImageType.BANKING_PROOF]: 'Banking Proof',
+  [documentImageType.BUSINESS_PROOF]: 'Business Proof',
+  [documentImageType.CO_APPLICANT]: 'Co-applicant Image',
+  [documentImageType.FORM_34]: 'Form 34',
+  [documentImageType.ID_PROOF]: 'ID Proof',
+  [documentImageType.INCOME_PROOF]: 'Income Proof',
+  [documentImageType.INSURANCE]: 'Insurance',
+  [documentImageType.NOC]: 'NOC',
+  [documentImageType.OTHER_DOCUMENTS]: 'Other Document',
+  [documentImageType.PASSPORT]: 'Passport',
+  [documentImageType.PERMANENT_ADDRESS]: 'Permanent Address',
+  [documentImageType.SANCTION_LETTER]: 'Sanction Letter',
+  [documentImageType.SOA]: 'Form24 or SOA',
+  [documentImageType.PASSPORT_SIZE_PHOTO]: 'Passport Image',
+  [documentImageType.CO_APPLICANT_DOCUMENTS]: 'Co-applicant Image',
+  [documentImageType.SPECIAL_DOCUMENTS]: 'Special Documents',
+};
+
 export const KYC_LABELS = {
   pancardPhoto: 'PAN Card',
   aadharFrontPhoto: 'Aadhar Card Front',
   aadharBackphoto: 'Aadhar Card Back',
 };
+
+export const API_TRIGGER = {
+  DEFAULT: 'default',
+  LOAD_MORE: 'loadMore',
+  PULL_TO_REFRESH: 'pullToRefresh',
+};
+
+export const occupationType = Object.freeze({
+  SALARIED: 'SALARIED',
+  SELF_EMPLOYED: 'SELF_EMPLOYED',
+  SELF_EMPLOYED_PROFESSIONAL: 'SELF_EMPLOYED_PROFESSIONAL',
+  AGRICULTURE: 'AGRICULTURE',
+  OTHER: 'OTHER',
+});
+
+export const occupationLabelMap = {
+  [occupationType.SALARIED]: 'Salaried',
+  [occupationType.SELF_EMPLOYED]: 'Self-Employed',
+  [occupationType.SELF_EMPLOYED_PROFESSIONAL]: 'Self-Employed Professional',
+  [occupationType.AGRICULTURE]: 'Agriculture',
+  [occupationType.OTHER]: 'Other',
+};
+
+export const documentType = Object.freeze({
+  [documentImageType.ID_PROOF]: 'idProofType',
+  [documentImageType.ADDRESS_PROOF]: 'addressProofType',
+  [documentImageType.PERMANENT_ADDRESS]: 'permanentAddressType',
+  [documentImageType.INCOME_PROOF]: 'incomeProofType',
+  [documentImageType.BANKING_PROOF]: 'bankingProofType',
+  [documentImageType.BUSINESS_PROOF]: 'businessProofType',
+  [documentImageType.INSURANCE]: 'insuranceProofType',
+  [documentImageType.OTHER_DOCUMENTS]: 'otherDocumentsType',
+  [documentImageType.FORM_34]: 'form34DocumentType',
+  [documentImageType.SOA]: 'soaDocumentType',
+  [documentImageType.SANCTION_LETTER]: 'sanctionLetterType',
+  [documentImageType.NOC]: 'nocDocumentType',
+});

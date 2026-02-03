@@ -1,4 +1,10 @@
 import {types} from '../actions';
+import {
+  ADD_SALES_EXECUTIVE,
+  FETCH_SALES_EXECUTIVES,
+  REMOVE_SALES_EXECUTIVE,
+  REMOVE_SALES_EXECUTIVE_BY_ID,
+} from '../actions/actionType';
 
 const initialState = {
   salesExecutives: [],
@@ -13,21 +19,23 @@ const initialState = {
 
 const salesExecutiveReducer = (state = initialState, action) => {
   switch (action.type) {
-    case types.FETCH_SALES_EXECUTIVE_REQUEST:
-    case types.REMOVE_SALES_EXECUTIVE_REQUEST:
+    case FETCH_SALES_EXECUTIVES.REQUEST:
+    case ADD_SALES_EXECUTIVE.REQUEST:
+    case REMOVE_SALES_EXECUTIVE_BY_ID.REQUEST:
       return {
         ...state,
         loading: true,
       };
-    case types.FETCH_SALES_EXECUTIVE_FAILURE:
-    case types.REMOVE_SALES_EXECUTIVE_FAILURE:
+    case FETCH_SALES_EXECUTIVES.FAILURE:
+    case ADD_SALES_EXECUTIVE.FAILURE:
+    case REMOVE_SALES_EXECUTIVE_BY_ID.FAILURE:
       return {
         ...state,
         loading: false,
         message: action.payload.message,
         success: action.payload.success,
       };
-    case types.FETCH_SALES_EXECUTIVE_SUCCESS:
+    case FETCH_SALES_EXECUTIVES.SUCCESS:
       return {
         ...state,
         salesExecutives:
@@ -40,7 +48,7 @@ const salesExecutiveReducer = (state = initialState, action) => {
         total: action.payload.total,
         totalPages: action.payload.totalPages,
       };
-    case types.ADD_SALES_EXECUTIVE:
+    case ADD_SALES_EXECUTIVE.SUCCESS:
       return {
         ...state,
         salesExecutives: [action.payload, ...state.salesExecutives],
@@ -49,7 +57,7 @@ const salesExecutiveReducer = (state = initialState, action) => {
         loading: false,
       };
 
-    case types.REMOVE_SALES_EXECUTIVE:
+    case REMOVE_SALES_EXECUTIVE:
       return {
         ...state,
         loading: false,

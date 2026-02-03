@@ -9,10 +9,15 @@ import {endpoints} from './endpoints';
  * @returns {Promise<Object[]>} Array of loan applications
  * @throws Will throw an error if the request fails
  */
-export const fetchLoanApplications = async (page = 1, limit = 10) => {
+export const fetchLoanApplications = async (
+  page = 1,
+  limit = 10,
+  payload = {},
+) => {
   try {
     const response = await axiosInstance.get(endpoints.LOAN_APPLICATION.LIST, {
-      params: {page, limit},
+      ...payload,
+      params: {page, limit, ...(payload.params || {})},
     });
     return response.data;
   } catch (error) {

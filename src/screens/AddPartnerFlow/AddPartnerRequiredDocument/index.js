@@ -34,6 +34,8 @@ let partnerDocuments = [
   partnerDocumentType.BANK_STATEMENT,
   partnerDocumentType.CANCELLED_CHEQUE,
   partnerDocumentType.PHOTOGRAPH,
+  partnerDocumentType.AADHAR_CARD_BACK,
+  partnerDocumentType.AADHAR_CARD_FRONT,
 ];
 
 class AddPartnerRequiredDocument extends Component {
@@ -57,34 +59,32 @@ class AddPartnerRequiredDocument extends Component {
 
     const formattedDocs = {};
 
+    console.log('documentDetails', documentDetails);
+
     if (fromScreen) {
-      const formattedDocuments = await transformPartnerDocumentData(
-        documentDetails,
-        partnerDocuments,
-      );
-
-      let detail = await this.convertFormattedToDetails(formattedDocuments);
-      console.log({detail});
-
-      detail?.forEach(doc => {
-        formattedDocs[doc.documentType] = {
-          uri: doc.documentUrl,
-          isLocal: false,
-          type: null,
-          fileSize: null,
-          uploadedUrl: doc.documentUrl,
-          ...doc,
-        };
-      });
-
-      console.l;
-
       this.setState({
-        fromScreen,
         showImages: get(navState, 'showImages', []),
         errorSteps: get(navState, 'errorSteps', []),
       });
     }
+
+    const formattedDocuments = await transformPartnerDocumentData(
+      documentDetails,
+      partnerDocuments,
+    );
+
+    let detail = await this.convertFormattedToDetails(formattedDocuments);
+
+    detail?.forEach(doc => {
+      formattedDocs[doc.documentType] = {
+        uri: doc.documentUrl,
+        isLocal: false,
+        type: null,
+        fileSize: null,
+        uploadedUrl: doc.documentUrl,
+        ...doc,
+      };
+    });
 
     this.setState({
       fromScreen,
@@ -141,6 +141,7 @@ class AddPartnerRequiredDocument extends Component {
     if (!validateRequiredDocuments(documents, requiredFields)) {
       return;
     }
+
     let payload = Object.keys(documents).map(key => ({
       documentType: key,
       documentUrl: documents[key].uploadedUrl,
@@ -150,10 +151,12 @@ class AddPartnerRequiredDocument extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
-        payload,
+        {
+          documents: payload,
+        },
         onSuccess => {
           if (onSuccess?.success) {
             navigate(ScreenNames.AddPartnersBankDetail, navigationParams);
@@ -217,10 +220,11 @@ class AddPartnerRequiredDocument extends Component {
       id: doc.id,
       partnerId: doc.partnerId,
       documentType: doc.documentType || doc.selectedDocType,
-      documentUrl: doc.uploadedUrl || doc.uri,
+      documentUrl: doc.uri,
       verifiedByOps: doc.verifiedByOps ?? 'PENDING',
       uploadedAt: doc.uploadedAt || null,
       updatedAt: doc.updatedAt || null,
+      uploadedUrl: doc.uploadedUrl,
     }));
 
     return documentDetails;

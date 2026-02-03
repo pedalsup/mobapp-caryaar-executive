@@ -1,5 +1,6 @@
 import {fetchPartnerPerformances, fetchPartnerStats} from '../../services';
 import {showApiErrorToast} from '../../utils/helper';
+import {FETCH_PARTNER_PERFORMANCES, FETCH_PARTNER_STATS} from './actionType';
 import types from './types';
 
 /**
@@ -15,12 +16,12 @@ import types from './types';
  */
 export const fetchPartnerPerformancesThunk = (onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.PARTNER_PERFORMANCE_REQUEST});
+    dispatch({type: FETCH_PARTNER_PERFORMANCES.REQUEST});
 
     try {
       const response = await fetchPartnerPerformances();
       dispatch({
-        type: types.PARTNER_PERFORMANCE_SUCCESS,
+        type: FETCH_PARTNER_PERFORMANCES.SUCCESS,
         payload: {
           data: response.data,
         },
@@ -28,7 +29,7 @@ export const fetchPartnerPerformancesThunk = (onSuccess, onFailure) => {
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.PARTNER_PERFORMANCE_FAILURE,
+        type: FETCH_PARTNER_PERFORMANCES.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -50,12 +51,12 @@ export const fetchPartnerPerformancesThunk = (onSuccess, onFailure) => {
  */
 export const fetchPartnerStatsThunk = (onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.PARTNER_PERFORMANCE_STATS_REQUEST});
+    dispatch({type: FETCH_PARTNER_STATS.REQUEST});
 
     try {
       const response = await fetchPartnerStats();
       dispatch({
-        type: types.PARTNER_PERFORMANCE_STATS_SUCCESS,
+        type: FETCH_PARTNER_STATS.SUCCESS,
         payload: {
           data: response.data,
         },
@@ -63,7 +64,7 @@ export const fetchPartnerStatsThunk = (onSuccess, onFailure) => {
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.PARTNER_PERFORMANCE_FAILURE,
+        type: FETCH_PARTNER_STATS.FAILURE,
         payload: error.message,
       });
       showApiErrorToast(error);
@@ -71,23 +72,3 @@ export const fetchPartnerStatsThunk = (onSuccess, onFailure) => {
     }
   };
 };
-
-/**
- * Action creator to reset the partner performance data in the Redux store.
- *
- * @function clearPartnerPerformances
- * @returns {{type: string}} Redux action to reset partner performance.
- */
-export const clearPartnerPerformances = () => ({
-  type: types.RESET_PARTNER_PERFORMANCE,
-});
-
-/**
- * Action creator to reset the partner performance statistics in the Redux store.
- *
- * @function clearPartnerPerformanceStat
- * @returns {{type: string}} Redux action to reset partner performance stats.
- */
-export const clearPartnerPerformanceStat = () => ({
-  type: types.RESET_PARTNER_PERFORMANCE_STATS,
-});

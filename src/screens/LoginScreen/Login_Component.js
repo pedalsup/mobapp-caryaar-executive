@@ -85,6 +85,11 @@ const Login_Component = ({
                 autoFocus
                 returnKeyType={'done'}
                 onSubmitEditing={generateOTP}
+                restProps={
+                  {
+                    // caretHidden: caretHidden,
+                  }
+                }
               />
               <Spacing size="xl" />
               <Button label={strings.generateOTP} onPress={generateOTP} />

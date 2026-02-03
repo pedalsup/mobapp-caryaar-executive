@@ -10,9 +10,14 @@ import {
   handleFileSelection,
   viewDocumentHelper,
 } from '../../../utils/documentUtils';
-import {showToast} from '../../../utils/helper';
+import {
+  removeCountryCode,
+  showApiErrorToast,
+  showToast,
+} from '../../../utils/helper';
 import Edit_Profile_Component from './Edit_Profile_Component';
 import {validateField, handleFieldChange} from '../../../utils/inputHelper';
+import {uploadApplicantPhoto} from '../../../utils/fileUploadUtils';
 
 class EditProfileScreen extends Component {
   state = {
@@ -28,6 +33,7 @@ class EditProfileScreen extends Component {
       email: '',
     },
     isFormValid: false,
+    isLoadingDocument: false,
   };
 
   componentDidMount() {
@@ -44,11 +50,15 @@ class EditProfileScreen extends Component {
   handleSavePress = () => {
     let param = {
       name: this.state.fullName,
-      profileImage: 'https://randomuser.me/api/portraits/men/77.jpg',
+      profileImage: this.state.profileImage,
       email: this.state.email,
       mobileNumber: this.state.mobileNumber,
     };
+
+    console.log(JSON.stringify(param));
+
     const isFormValid = this.validateAllFields();
+
     if (!isFormValid) {
       return showToast('error', 'Please enter all field');
     }
@@ -76,26 +86,36 @@ class EditProfileScreen extends Component {
         return;
       }
 
-      const docObj = {
-        uri: asset.uri,
-        name: asset.fileName,
-        type: asset.type,
-        isLocal: true,
-        fileSize: asset.fileSize,
-        uploadedUrl:
-          'https://www.aeee.in/wp-content/uploads/2020/08/Sample-pdf.pdf', // mock
-      };
-
       this.setState({
-        profileImage: docObj.uri,
         showFilePicker: false,
       });
 
-      // TODO : Upload API call here to get the link
+      await new Promise(resolve => setTimeout(resolve, 200));
+      this.setState({isLoadingDocument: true});
+
+      try {
+        const url = await uploadApplicantPhoto(
+          asset,
+          asset.fileName || asset.name || '',
+          asset.type,
+        );
+
+        this.setState(prev => ({
+          profileImage: url,
+          showFilePicker: false,
+        }));
+      } catch (error) {
+        showApiErrorToast(error);
+      } finally {
+        this.setState({
+          isLoadingDocument: false,
+          showFilePicker: false,
+        });
+      }
     });
   };
 
-  onDeleteProfileImage = () => this.setState({profileImage: ''});
+  onDeleteProfileImage = () => this.setState({profileImage: null});
 
   handleViewImage = async () => {
     let uri = this.state.profileImage;
@@ -115,7 +135,7 @@ class EditProfileScreen extends Component {
         },
       );
     } finally {
-      this.setState({showFilePicker: false});
+      this.setState({showFilePicker: false, isLoadingDocument: false});
     }
   };
 
@@ -151,6 +171,7 @@ class EditProfileScreen extends Component {
       profileImage,
       showFilePicker,
       errors,
+      isLoadingDocument,
     } = this.state;
 
     const {isLoading} = this.props;
@@ -182,7 +203,7 @@ class EditProfileScreen extends Component {
             autoCapitalize: 'words',
           },
           mobileNumber: {
-            value: mobileNumber,
+            value: removeCountryCode(mobileNumber),
             isError: errors.mobileNumber,
             statusMsg: errors.mobileNumber,
           },
@@ -197,6 +218,7 @@ class EditProfileScreen extends Component {
           },
         }}
         isLoading={isLoading}
+        isLoadingDocument={isLoadingDocument}
       />
     );
   }

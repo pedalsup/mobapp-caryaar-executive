@@ -3,10 +3,17 @@ import {connect} from 'react-redux';
 import ScreenNames from '../../constants/ScreenNames';
 import {getScreenParam, navigate} from '../../navigation/NavigationUtils';
 import {fetchLoanApplicationFromIdThunk} from '../../redux/actions';
-import {viewDocumentHelper} from '../../utils/documentUtils';
+import {
+  getDocumentLink,
+  getDocumentRequirements,
+  transformDocumentData,
+  viewDocumentHelper,
+} from '../../utils/documentUtils';
 import {
   formatDate,
   formatIndianNumber,
+  formatMonths,
+  formatValueWithUnit,
   getRelativeTime,
   getTimeDifference,
   showToast,
@@ -14,6 +21,23 @@ import {
 import Application_Detail_Component from './Application_Detail_Component';
 import {get} from 'lodash';
 import {Linking} from 'react-native';
+import {
+  documentImageLabelMap,
+  documentImageType,
+  getLabelFromEnum,
+  occupationLabelMap,
+} from '../../constants/enums';
+
+const loanDocuments = [
+  documentImageType.ID_PROOF,
+  documentImageType.ADDRESS_PROOF,
+  documentImageType.PERMANENT_ADDRESS,
+  documentImageType.INCOME_PROOF,
+  documentImageType.BANKING_PROOF,
+  documentImageType.BUSINESS_PROOF,
+  documentImageType.INSURANCE,
+  documentImageType.OTHER_DOCUMENTS,
+];
 
 class ApplicationDetailScreen extends Component {
   state = {
@@ -21,28 +45,122 @@ class ApplicationDetailScreen extends Component {
     applicationDetail: {},
     isLoading: false,
     documentType: '',
+    aadharBackphotoLink: null,
+    aadharFrontPhotoLink: null,
+    pancardPhotoLink: null,
+    loading: false,
+    documents: {},
   };
 
   componentDidMount() {
-    const {applicationID} = this.state;
-    if (applicationID) {
-      this.props.fetchLoanApplicationFromIdThunk(applicationID);
+    const loanId = this.props.route.params.loanId || '';
+    const {selectedLoanApplication} = this.props;
+
+    if (loanId && !selectedLoanApplication) {
+      this.setState({loading: true});
+
+      this.props.fetchLoanApplicationFromIdThunk(
+        loanId,
+        async response => {
+          if (!response?.success) {
+            this.setState({loading: false});
+            return;
+          }
+
+          try {
+            const detail = response?.data?.[0]?.customer?.customerDetails ?? {};
+            const customerLoanDocuments =
+              response?.data?.[0]?.customer?.CustomerLoanDocuments?.[0] ?? {};
+
+            const [back, front, pancard] = await Promise.all([
+              getDocumentLink(detail?.aadharBackphoto),
+              getDocumentLink(detail?.aadharFrontPhoto),
+              getDocumentLink(detail?.pancardPhoto),
+            ]);
+
+            const formattedDocuments = await transformDocumentData(
+              customerLoanDocuments,
+              loanDocuments,
+            );
+
+            this.setState(
+              {
+                aadharBackphotoLink: back,
+                aadharFrontPhotoLink: front,
+                pancardPhotoLink: pancard,
+                documents: formattedDocuments,
+              },
+              () => {
+                this.setState({loading: false});
+              },
+            );
+          } catch (e) {
+            this.setState({loading: false});
+          }
+        },
+        () => {
+          this.setState({loading: false});
+        },
+      );
     }
+
+    // if (loanId && !selectedLoanApplication) {
+    //   this.setState({loading: true});
+    //   this.props.fetchLoanApplicationFromIdThunk(
+    //     loanId,
+    //     async response => {
+    //       console.log('response---------', response);
+
+    //       if (response?.success) {
+    //         const detail = response?.data?.[0]?.customer?.customerDetails || {};
+    //         const customerLoanDocuments =
+    //           response?.data?.[0]?.customer?.CustomerLoanDocuments?.[0] || {};
+
+    //         const [back, front, pancard] = await Promise.all([
+    //           getDocumentLink(detail?.aadharBackphoto),
+    //           getDocumentLink(detail?.aadharFrontPhoto),
+    //           getDocumentLink(detail?.pancardPhoto),
+    //         ]);
+
+    //         this.setState({
+    //           aadharBackphotoLink: back,
+    //           aadharFrontPhotoLink: front,
+    //           pancardPhotoLink: pancard,
+    //         });
+
+    //         await new Promise(resolve => setTimeout(resolve, 100));
+
+    //         const formattedDocuments = await transformDocumentData(
+    //           customerLoanDocuments,
+    //           loanDocuments,
+    //         );
+
+    //         this.setState({documents: formattedDocuments});
+    //         await new Promise(resolve => setTimeout(resolve, 100));
+    //         this.setState({loading: false});
+    //       } else {
+    //         this.setState({loading: false});
+    //       }
+    //     },
+    //     error => {
+    //       this.setState({loading: false});
+    //     },
+    //   );
+    // }
   }
 
   safeGet = (obj, path) => {
     return this.props.loading ? '-' : get(obj, path, '-');
   };
 
-  //TODO check the logic with backend team
   getProcessingTime = () => {
     return;
     const submittedOn = this.safeGet(
-      this.props.selectedLoanApplications,
+      this.props.selectedLoanApplication,
       'createdAt',
     );
     const lastUpdatedOn = this.safeGet(
-      this.props.selectedLoanApplications,
+      this.props.selectedLoanApplication,
       'updatedAt',
     );
 
@@ -53,7 +171,9 @@ class ApplicationDetailScreen extends Component {
     return getTimeDifference(submittedOn, lastUpdatedOn);
   };
 
-  requestDocument = key => showToast('info', `Request ${key}`);
+  requestDocument = key => {
+    // showToast('info', `Request ${key}`);
+  };
 
   onDocumentPress = async (type, link, hasDocument) => {
     if (!hasDocument) {
@@ -81,13 +201,13 @@ class ApplicationDetailScreen extends Component {
 
   contactPartner = () => {
     const mobileNumber =
-      this.props.selectedLoanApplications?.partnerUser?.user?.mobileNumber;
+      this.props.selectedLoanApplication?.partnerUser?.user?.mobileNumber;
     this.contactUser('Partner', mobileNumber);
   };
 
   contactCustomer = () => {
     const mobileNumber =
-      this.props.selectedLoanApplications?.customer?.mobileNumber;
+      this.props.selectedLoanApplication?.customer?.mobileNumber;
     this.contactUser('Customer', mobileNumber);
   };
 
@@ -108,19 +228,43 @@ class ApplicationDetailScreen extends Component {
       });
   };
 
-  onTackApplicationPress = () => navigate(ScreenNames.TrackApplication);
+  onTackApplicationPress = () => {
+    navigate(ScreenNames.TrackApplication, {
+      params: this.props.selectedLoanApplication,
+    });
+  };
 
   render() {
-    const {loading, selectedLoanApplications} = this.props;
+    const {
+      pancardPhotoLink,
+      aadharBackphotoLink,
+      aadharFrontPhotoLink,
+      documents,
+    } = this.state;
+    const {loading, selectedLoanApplication} = this.props;
     const {
       partner = {},
       usedVehicle = {},
       customer = {},
       vehicle = {},
-    } = selectedLoanApplications || {};
+    } = selectedLoanApplication || {};
 
-    const submittedOn = this.safeGet(selectedLoanApplications, 'createdAt');
-    const lastUpdatedOn = this.safeGet(selectedLoanApplications, 'updatedAt');
+    const submittedOn = this.safeGet(selectedLoanApplication, 'createdAt');
+    const lastUpdatedOn = this.safeGet(selectedLoanApplication, 'updatedAt');
+    const occupationType = this.safeGet(
+      customer?.customerDetails,
+      'occupation',
+    );
+
+    const typeOfIndividual =
+      selectedLoanApplication?.customer?.customerDetails?.occupation;
+    const loanProduct = selectedLoanApplication?.loanType;
+
+    const docs = getDocumentRequirements(
+      loanProduct,
+      typeOfIndividual,
+      loanDocuments,
+    );
 
     return (
       <Application_Detail_Component
@@ -139,7 +283,7 @@ class ApplicationDetailScreen extends Component {
           {
             label: 'Loan Amount',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'loanAmount'),
+              this.safeGet(selectedLoanApplication, 'loanAmount'),
             ),
           },
         ]}
@@ -155,60 +299,74 @@ class ApplicationDetailScreen extends Component {
           },
           {
             label: 'Type',
-            value: this.safeGet(customer?.customerDetails, 'occupation'),
+            value: getLabelFromEnum(occupationLabelMap, occupationType),
           },
         ]}
         loanDetail={[
           {
             label: 'Amount',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'loanAmount'),
+              this.safeGet(selectedLoanApplication, 'loanAmount'),
             ),
           },
           {
             label: 'Tenure',
-            value: `${this.safeGet(selectedLoanApplications, 'tenure')} Months`,
+            value: formatValueWithUnit({
+              value: selectedLoanApplication?.tenure,
+              loading,
+              unit: 'Months',
+            }),
           },
           {
             label: 'Interest Rate',
-            value: `${this.safeGet(
-              selectedLoanApplications,
-              'interesetRate',
-            )}%`,
+            value: formatValueWithUnit({
+              value: selectedLoanApplication?.interesetRate,
+              loading,
+              unit: '%',
+            }),
           },
           {
             label: 'EMI',
             value: formatIndianNumber(
-              this.safeGet(selectedLoanApplications, 'emi'),
+              this.safeGet(selectedLoanApplication, 'emi'),
             ),
           },
         ]}
         onTackApplicationPress={this.onTackApplicationPress}
         isLoading={this.state.isLoading}
-        loading={loading}
+        loading={this.state.loading}
         loanApplicationId={this.safeGet(
-          selectedLoanApplications,
+          selectedLoanApplication,
           'loanApplicationId',
         )}
-        loanStatus={this.safeGet(selectedLoanApplications, 'status')}
+        loanStatus={this.safeGet(selectedLoanApplication, 'status')}
         businessName={this.safeGet(partner, 'businessName')}
         additionalNotes={usedVehicle?.additionalNotes}
         submittedOn={formatDate(submittedOn)}
         processingTime={this.getProcessingTime()}
         lastUpdatedOn={getRelativeTime(lastUpdatedOn)}
-        loanDocuments={customer?.loanDocuments}
-        kycDocuments={customer?.customerDetails}
+        kycDocuments={{
+          pancardPhoto: pancardPhotoLink,
+          aadharFrontPhoto: aadharFrontPhotoLink,
+          aadharBackphoto: aadharBackphotoLink,
+        }}
         onDocumentPress={this.onDocumentPress}
         documentType={this.state.documentType}
         contactCustomer={this.contactCustomer}
         contactPartner={this.contactPartner}
+        documentList={docs?.map(type => ({
+          type,
+          label: documentImageLabelMap[type],
+          docObject: documents[type],
+        }))}
       />
     );
   }
 }
 
 const mapStateToProps = ({applications}) => ({
-  selectedLoanApplications: applications.selectedLoanApplications,
+  selectedLoanApplication: applications.selectedLoanApplication,
+  selectedApplicationId: applications?.selectedApplicationId,
   loading: applications.loading,
 });
 

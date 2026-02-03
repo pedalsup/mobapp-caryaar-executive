@@ -58,11 +58,43 @@ export const getScreenParam = (route, key) => {
   return route?.params?.[key] || null;
 };
 
+// export const navigateToTab = tabScreenName => {
+//   navigationRef.current?.dispatch(
+//     CommonActions.reset({
+//       index: 0,
+//       routes: [{name: ScreenNames.HomeTab, params: {screen: tabScreenName}}],
+//     }),
+//   );
+// };
+
 export const navigateToTab = tabScreenName => {
   navigationRef.current?.dispatch(
     CommonActions.reset({
       index: 0,
-      routes: [{name: ScreenNames.HomeTab, params: {screen: tabScreenName}}],
+      routes: [
+        {
+          name: ScreenNames.HomeTab,
+          state: {
+            index: 0,
+            routes: [{name: tabScreenName}],
+          },
+        },
+      ],
+    }),
+  );
+};
+
+export const resetToPartnerDetail = partnerId => {
+  navigationRef.current?.dispatch(
+    CommonActions.reset({
+      index: 1,
+      routes: [
+        {name: ScreenNames.Partners},
+        {
+          name: ScreenNames.PartnerDetail,
+          params: {partnerId},
+        },
+      ],
     }),
   );
 };

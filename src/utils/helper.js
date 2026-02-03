@@ -5,6 +5,7 @@ import theme from '../theme';
 import colors from '../theme/colors';
 import {navigate} from '../navigation/NavigationUtils';
 import ScreenNames from '../constants/ScreenNames';
+import get from 'lodash/get';
 
 /**
  * Format a numeric value into Indian currency style (e.g., ₹12,34,567.89)
@@ -13,6 +14,10 @@ import ScreenNames from '../constants/ScreenNames';
  * @returns {string}
  */
 export const formatIndianNumber = (value, showSign = true) => {
+  if (value === null || value === undefined || value === '') {
+    return '-';
+  }
+
   const [intPart, decimalPart] = value?.toString().split('.');
   let cleaned = intPart.replace(/[^0-9]/g, '');
 
@@ -40,26 +45,6 @@ export const formatIndianNumber = (value, showSign = true) => {
  */
 export const formatAmount = text =>
   text.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
-
-/**
- * Get gradient color array based on application status
- * @param {number} status
- * @returns {string[]}
- */
-export const getGradientColors = status => {
-  switch (status) {
-    case applicationStatus.PENDING:
-    case applicationStatus.IN_REVIEW:
-      return colors.appliedGradient;
-    case applicationStatus.APPROVED:
-      return colors.lenderApprovedGradient;
-    case applicationStatus.REJECTED:
-    case applicationStatus.QUERY:
-      return colors.onHoldGradient;
-    default:
-      return colors.appliedGradient;
-  }
-};
 
 /**
  * Return background color for given application status
@@ -237,7 +222,7 @@ export const showToast = (
 export const showApiErrorToast = error => {
   let type = 'warning';
   let message = getErrorMessage(error);
-  if (error?.status === 503 || error?.status === 400) {
+  if (error?.status === 1001) {
     type = 'warning';
     message = 'Service is temporarily unavailable. Please try again later.';
   }
@@ -407,3 +392,82 @@ export const getTimeDifference = (from, to = new Date()) => {
   const seconds = Math.floor(duration.asSeconds());
   return format(seconds, 'second');
 };
+
+export const formatValueWithUnit = ({
+  value,
+  loading = false,
+  unit = '',
+  fallback = '-',
+  showZero = true,
+}) => {
+  if (loading) {
+    return fallback;
+  }
+  if (value === null || value === undefined || value === '') {
+    return fallback;
+  }
+  if (!showZero && Number(value) === 0) {
+    return fallback;
+  }
+
+  return unit ? `${value} ${unit}` : `${value}`;
+};
+
+/**
+ * Get gradient color array based on application status
+ * @param {number} status
+ * @returns {string[]}
+ */
+export const getApplicationGradientColors = status => {
+  switch (status) {
+    case applicationStatus.IN_REVIEW:
+      return theme.colors.appliedGradient;
+    case applicationStatus.APPROVED:
+    case applicationStatus.DISBURSED:
+      return theme.colors.lenderApprovedGradient;
+    case applicationStatus.REJECTED:
+    case applicationStatus.QUERY:
+      return theme.colors.onHoldGradient;
+    case applicationStatus.DRAFT:
+      return ['#E8E8E8', '#E8E8E8'];
+    default:
+      return theme.colors.appliedGradient;
+  }
+};
+
+/**
+ * Return background color for given application status
+ * @param {string} status
+ * @returns {string}
+ */
+export const getApplicationStatusColor = status => {
+  switch (status) {
+    case applicationStatus.IN_REVIEW:
+    case applicationStatus.APPROVED:
+    case applicationStatus.REJECTED:
+    case applicationStatus.QUERY:
+    case applicationStatus.DISBURSED:
+      return 'rgba(0, 0, 0, 0.36)';
+    case applicationStatus.DRAFT:
+      return '#828282';
+    default:
+      return theme.colors.textPrimary;
+  }
+};
+
+/**
+ * Safely gets a value from an object, returns fallback if loading or value is undefined.
+ *
+ * @param {Object} obj - The source object.
+ * @param {string | Array<string>} path - Path to the property (lodash-style).
+ * @param {boolean} loading - If true, fallback will be returned regardless of value.
+ * @param {*} fallback - The fallback value if not found or loading is true.
+ * @returns {*} The resolved value or fallback.
+ */
+export const safeGet = (loading = false, obj, path, fallback = '-') => {
+  return loading ? fallback : get(obj, path, fallback);
+};
+
+// export const removeCountryCode = (number) =>{
+//   return number.startsWith('+91') ? number.slice(3) : number;
+// }

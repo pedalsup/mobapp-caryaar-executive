@@ -4,10 +4,11 @@ import {
   SafeAreaWrapper,
   theme,
   images,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {StyleSheet, FlatList} from 'react-native';
-import {Loader, NoDataFound} from '../../components';
+import {NoDataFound} from '../../components';
 import {getRelativeTime} from '../../utils/helper';
 
 const Notification_Component = ({

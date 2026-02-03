@@ -27,6 +27,9 @@ const strings = {
   errorMissingField: 'Please fill in all required fields.',
   errorNoDocumentUpload:
     'No document available to view. Please add or upload one.',
+  deleteMember: 'Delete Member',
+  deleteMemberConfirmationMessage:
+    'Deleting this member will permanently remove them from the system and revoke all associated access. This action cannot be undone.',
 };
 
 export default strings;

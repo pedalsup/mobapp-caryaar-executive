@@ -1,25 +1,16 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../components';
-import {
-  getLabelFromEnum,
-  partnerUserPositionValue,
-  salesExecutiveValue,
-} from '../../constants/enums';
+import {getLabelFromEnum, salesExecutiveValue} from '../../constants/enums';
 import ScreenNames from '../../constants/ScreenNames';
-import {
-  navigate,
-  navigateAndSimpleReset,
-} from '../../navigation/NavigationUtils';
+import {navigate} from '../../navigation/NavigationUtils';
 import {
   fetchUser,
+  logoutUser,
   resetAppState,
   resetSalesExecutive,
   setLoginStatus,
-  logoutUser,
 } from '../../redux/actions';
 import {removeCountryCode} from '../../utils/helper';
-import {clearLoginStatus} from '../../utils/storage';
 import Profile_Component from './Profile_Component';
 
 class ProfileScreen extends Component {
@@ -88,30 +79,25 @@ class ProfileScreen extends Component {
 
   render() {
     const {showLogoutModal} = this.state;
-    const {profileDetail} = this.props;
+    const {profileDetail, loading} = this.props;
 
     return (
-      <>
-        <Profile_Component
-          handleMenuPress={this.handleMenuPress}
-          onRightIconPress={this.onRightIconPress}
-          onEditProfilePress={this.onEditProfilePress}
-          showLogoutModal={showLogoutModal}
-          onPressPrimaryButton={this.onPressPrimaryButton}
-          onModalHide={this.onModalHide}
-          // address={getLocationText()}
-          name={profileDetail?.name}
-          email={profileDetail?.email}
-          phone={removeCountryCode(profileDetail?.mobileNumber)}
-          designation={getLabelFromEnum(
-            salesExecutiveValue,
-            profileDetail?.role,
-          )}
-          avatar={profileDetail?.profileImage}
-          userID={getLabelFromEnum(salesExecutiveValue, profileDetail?.role)}
-        />
-        {this.props.loading && <Loader visible={this.props.loading} />}
-      </>
+      <Profile_Component
+        handleMenuPress={this.handleMenuPress}
+        onRightIconPress={this.onRightIconPress}
+        onEditProfilePress={this.onEditProfilePress}
+        showLogoutModal={showLogoutModal}
+        onPressPrimaryButton={this.onPressPrimaryButton}
+        onModalHide={this.onModalHide}
+        // address={getLocationText()}
+        name={profileDetail?.name}
+        email={profileDetail?.email}
+        phone={removeCountryCode(profileDetail?.mobileNumber)}
+        designation={getLabelFromEnum(salesExecutiveValue, profileDetail?.role)}
+        avatar={profileDetail?.profileImage}
+        userID={profileDetail?.id}
+        loading={loading}
+      />
     );
   }
 }

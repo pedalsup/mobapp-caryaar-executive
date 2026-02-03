@@ -22,8 +22,8 @@ export const styles = StyleSheet.create({
     fontFamily: theme.typography.fonts.hankenGroteskBold,
     fontWeight: theme.typography.fontWeights.bold,
     textAlign: 'center',
-    flex: 1,
-    paddingVertical: 0,
+    flex: 1, // ✅ Takes full width
+    paddingVertical: 0, // ✅ Prevent vertical shift
   },
   labelIcon: {
     height: theme.sizes.icons.smd,

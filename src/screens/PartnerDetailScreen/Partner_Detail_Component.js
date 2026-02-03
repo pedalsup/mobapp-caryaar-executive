@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   CustomerCard,
   DetailInfoCard,
@@ -6,6 +7,10 @@ import {
   SafeAreaWrapper,
   Spacing,
   theme,
+  Loader,
+  Text,
+  Pressable,
+  FullLoader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
@@ -22,6 +27,8 @@ const Partner_Detail_Component = ({
   footerInfo,
   onEditPartnerDetail,
   businessName,
+  isLoading,
+  onViewGoogleMapPress,
 }) => {
   return (
     <SafeAreaWrapper backgroundColor={theme.colors.background}>
@@ -57,14 +64,30 @@ const Partner_Detail_Component = ({
           <Spacing size="lg" />
 
           {/* Location Info with map placeholder */}
-          <DetailInfoCard label="Location Detail" data={locationDetail} bottom>
-            <View style={styles.mapPlaceholder} />
+          <DetailInfoCard label="Location Details" data={locationDetail} bottom>
+            <View style={{marginTop: 12}}>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text type="helper-text" size="caption">
+                  Google Map Location
+                </Text>
+                <Pressable onPress={onViewGoogleMapPress}>
+                  <Text
+                    size="caption"
+                    hankenGroteskBold
+                    color={theme.colors.primary}>
+                    View In Google Map
+                  </Text>
+                </Pressable>
+              </View>
+              <View style={styles.mapPlaceholder} />
+            </View>
           </DetailInfoCard>
 
           <Spacing size="lg" />
 
           {/* Documents */}
-          <DetailInfoCard label="Business Document">
+          <DetailInfoCard label="Business Documents">
             {documents.map((doc, index) => {
               return (
                 <React.Fragment key={`doc-${doc.label || index}`}>
@@ -76,10 +99,10 @@ const Partner_Detail_Component = ({
                     showError={doc.isMissing || !doc.uploaded}
                     disabled={doc.isMissing || !doc.uploaded}
                     onPress={doc?.onPress}
-                    isLoading={
-                      isFetchingDocument?.loading &&
-                      isFetchingDocument?.documentType === doc.documentType
-                    }
+                    // isLoading={
+                    //   isFetchingDocument?.loading &&
+                    //   isFetchingDocument?.documentType === doc.documentType
+                    // }
                   />
                   {/* Spacing between rows */}
                   {index !== documents.length - 1 && (
@@ -93,9 +116,13 @@ const Partner_Detail_Component = ({
           <Spacing size="lg" />
 
           {/* Account Info */}
-          <DetailInfoCard label="Account Detail" data={accountDetail} />
+          <DetailInfoCard label="Account Details" data={accountDetail} />
         </View>
       </ScrollView>
+      {isLoading && <Loader visible={isLoading} />}
+      {isFetchingDocument?.loading && (
+        <FullLoader visible={isFetchingDocument?.loading} />
+      )}
     </SafeAreaWrapper>
   );
 };
@@ -116,8 +143,8 @@ const styles = StyleSheet.create({
   mapPlaceholder: {
     backgroundColor: '#FF5B5E70', // Semi-transparent red placeholder
     height: 92,
-    marginTop: 12,
     borderRadius: theme.sizes.borderRadius.card,
+    marginTop: 8,
   },
 });
 

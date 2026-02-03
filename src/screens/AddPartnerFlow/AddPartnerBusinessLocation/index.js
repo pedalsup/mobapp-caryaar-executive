@@ -50,6 +50,7 @@ class AddPartnerBusinessLocation extends Component {
         errorSteps: get(navState, 'errorSteps', []),
       });
     }
+
     this.setState({
       fromScreen: fromScreen,
       companyName: get(locationDetails, 'companyName', ''),
@@ -59,7 +60,7 @@ class AddPartnerBusinessLocation extends Component {
       area: get(locationDetails, 'area', ''),
       stateName: get(locationDetails, 'state', ''),
       pincode: get(locationDetails, 'pincode', ''),
-      cityName: get(locationDetails, 'city', ''),
+      cityName: get(locationDetails, 'city', 'XXX'),
     });
   }
 
@@ -76,7 +77,7 @@ class AddPartnerBusinessLocation extends Component {
       'area',
       'stateName',
       'pincode',
-      'cityName',
+      // 'cityName',
     ];
 
     const errors = {};
@@ -129,10 +130,10 @@ class AddPartnerBusinessLocation extends Component {
       streetAddress: street,
       area,
       state: stateName,
-      pincode: Number(pincode),
-      latitude: '19.076',
-      longitude: '72.877',
-      city: 'Mumbai',
+      pincode: pincode,
+      latitude: 19.076,
+      longitude: 72.877,
+      city: '',
     };
 
     // Common navigation params
@@ -140,7 +141,7 @@ class AddPartnerBusinessLocation extends Component {
       params: {fromScreen, showImages, errorSteps},
     };
 
-    if (!isExistingPartner) {
+    if (isExistingPartner) {
       await this.props.updatePartnerThunk(
         selectedPartnerId,
         payLoad,
@@ -239,7 +240,7 @@ class AddPartnerBusinessLocation extends Component {
             value: pincode,
             isError: errors.pincode,
             statusMsg: errors.pincode,
-            rightLabel: cityName,
+            rightLabel: '', //cityName
             rightLabelPress: () => {},
             keyboardType: 'numeric',
             returnKeyType: 'done',

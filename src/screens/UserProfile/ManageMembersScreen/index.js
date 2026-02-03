@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
 
-import {Alert} from 'react-native';
 import {connect} from 'react-redux';
-import {Loader} from '../../../components';
 import {salesExecOptions} from '../../../constants/enums';
 import {
   createSalesExecutiveThunk,
   deleteSalesExecutiveByIdThunk,
   fetchSalesExecutivesThunk,
-  removeSalesExecutive,
 } from '../../../redux/actions';
-import {formatMobileNumber, getErrorMessage} from '../../../utils/helper';
+import {
+  formatMobileNumber,
+  getErrorMessage,
+  showToast,
+} from '../../../utils/helper';
+import {handleFieldChange, validateField} from '../../../utils/inputHelper';
 import Manage_Members_Component from './Manage_Members_Component';
-import {validateField, handleFieldChange} from '../../../utils/inputHelper';
 
 class ManageMemberScreen extends Component {
   constructor(props) {
@@ -33,6 +34,9 @@ class ManageMemberScreen extends Component {
       isFormValid: false,
       refreshing: false,
       loadingMore: false,
+      isDeleteModalVisible: false,
+      selectedMember: null,
+      loading: false,
     };
     this.handleDeleteMemberPress = this.handleDeleteMemberPress.bind(this);
     this.handleAddNewMemberPress = this.handleAddNewMemberPress.bind(this);
@@ -51,26 +55,10 @@ class ManageMemberScreen extends Component {
   };
 
   handleDeleteMemberPress = (item, index) => {
-    Alert.alert(
-      'Delete Member',
-      `Are you sure you want to delete ${item.fullName || 'this member'}?`,
-      [
-        {
-          text: 'Cancel',
-          onPress: () => {},
-          style: 'cancel', // Makes the button bold
-        },
-        {
-          text: 'OK',
-          onPress: () => this.deleteMember(item, index),
-        },
-      ],
-      {cancelable: true},
-    );
-  };
-
-  deleteMember = (item, index) => {
-    this.props.deleteSalesExecutiveByIdThunk(item?.userId);
+    this.setState({
+      isDeleteModalVisible: true,
+      selectedMember: item,
+    });
   };
 
   handleAddNewMemberPress = () => {
@@ -114,8 +102,10 @@ class ManageMemberScreen extends Component {
             this.onModalHide();
           }
         },
-        error => {
-          Alert.alert(getErrorMessage(error));
+        async error => {
+          this.onModalHide();
+          await new Promise(resolve => setTimeout(resolve, 200));
+          showToast('error', getErrorMessage(error));
         },
       );
     }
@@ -179,6 +169,39 @@ class ManageMemberScreen extends Component {
     await this.fetchSalesExecutives(1); // fetch first page of normal applications
   };
 
+  hideDeleteModal = () => {
+    this.setState({
+      isDeleteModalVisible: false,
+      selectedMember: null,
+    });
+  };
+
+  onDeleteMemberConfirm = () => {
+    const {selectedMember} = this.state;
+    if (!selectedMember?.userId) {
+      return;
+    }
+
+    this.setState({loading: true});
+
+    const finalize = () => {
+      this.setState({loading: false});
+      this.hideDeleteModal();
+    };
+
+    this.props.deleteSalesExecutiveByIdThunk(
+      selectedMember?.userId,
+      async onSuccess => {
+        finalize();
+        await new Promise(resolve => setTimeout(resolve, 220));
+        showToast('success', onSuccess?.message);
+      },
+      error => {
+        finalize();
+      },
+    );
+  };
+
   render() {
     const {
       mobileNumber,
@@ -188,59 +211,64 @@ class ManageMemberScreen extends Component {
       errors,
       email,
       refreshing,
+      isDeleteModalVisible,
     } = this.state;
     const {salesExecutives, loading} = this.props;
     return (
-      <>
-        <Manage_Members_Component
-          handleDeleteMemberPress={this.handleDeleteMemberPress}
-          handleAddNewMemberPress={this.handleAddNewMemberPress}
-          memberList={this.state.memberList}
-          isVisible={this.state.isVisible}
-          onModalHide={this.onModalHide}
-          onPressPrimaryButton={this.onPressPrimaryButton}
-          mobileNumber={mobileNumber}
-          fullName={fullName}
-          onChangeFullName={value => this.onChangeField('fullName', value)}
-          onChangeMobileNumber={value =>
-            this.onChangeField('mobileNumber', value)
-          }
-          onChangeEmail={value => this.onChangeField('email', value)}
-          setSelectedSalesExec={this.setSelectedSalesExec}
-          selectedSalesExec={selectedSalesExec?.label}
-          salesExecOptions={salesExecOptions}
-          salesExecutives={salesExecutives}
-          handleLoadMore={this.handleLoadMore}
-          isLoading={loading && !refreshing && !loadingMore}
-          restInputProps={{
-            fullName: {
-              value: fullName,
-              isError: errors.fullName,
-              statusMsg: errors.fullName,
-              autoCapitalize: 'words',
-            },
-            mobileNumber: {
-              value: mobileNumber,
-              isError: errors.mobileNumber,
-              statusMsg: errors.mobileNumber,
-            },
-            selectedSalesExec: {
-              isError: errors.selectedSalesExecValue,
-              statusMsg: errors.selectedSalesExecValue,
-            },
-            email: {
-              value: email,
-              isError: errors.email,
-              statusMsg: errors.email,
-            },
-          }}
-          refreshing={refreshing}
-          onRefresh={this.handleRefresh}
-          currentPage={this.props.page}
-          totalPages={this.props.totalPages}
-          loadingMore={this.state.loadingMore}
-        />
-      </>
+      <Manage_Members_Component
+        handleDeleteMemberPress={this.handleDeleteMemberPress}
+        handleAddNewMemberPress={this.handleAddNewMemberPress}
+        memberList={this.state.memberList}
+        isVisible={this.state.isVisible}
+        onModalHide={this.onModalHide}
+        onPressPrimaryButton={this.onPressPrimaryButton}
+        mobileNumber={mobileNumber}
+        fullName={fullName}
+        onChangeFullName={value => this.onChangeField('fullName', value)}
+        onChangeMobileNumber={value =>
+          this.onChangeField('mobileNumber', value)
+        }
+        onChangeEmail={value => this.onChangeField('email', value)}
+        setSelectedSalesExec={this.setSelectedSalesExec}
+        selectedSalesExec={selectedSalesExec?.label}
+        salesExecOptions={salesExecOptions}
+        salesExecutives={salesExecutives}
+        handleLoadMore={this.handleLoadMore}
+        isLoading={loading && !refreshing && !loadingMore}
+        restInputProps={{
+          fullName: {
+            value: fullName,
+            isError: errors.fullName,
+            statusMsg: errors.fullName,
+            autoCapitalize: 'words',
+          },
+          mobileNumber: {
+            value: mobileNumber,
+            isError: errors.mobileNumber,
+            statusMsg: errors.mobileNumber,
+          },
+          selectedSalesExec: {
+            isError: errors.selectedSalesExecValue,
+            statusMsg: errors.selectedSalesExecValue,
+          },
+          email: {
+            value: email,
+            isError: errors.email,
+            statusMsg: errors.email,
+          },
+        }}
+        refreshing={refreshing}
+        onRefresh={this.handleRefresh}
+        currentPage={this.props.page}
+        totalPages={this.props.totalPages}
+        loadingMore={this.state.loadingMore}
+        deleteModalProp={{
+          isDeleteModalVisible: isDeleteModalVisible,
+          onModalHide: this.hideDeleteModal,
+          onDeleteMemberConfirm: this.onDeleteMemberConfirm,
+          loading: this.state.loading,
+        }}
+      />
     );
   }
 }
@@ -248,7 +276,6 @@ class ManageMemberScreen extends Component {
 const mapDispatchToProps = {
   fetchSalesExecutivesThunk,
   deleteSalesExecutiveByIdThunk,
-  removeSalesExecutive,
   createSalesExecutiveThunk,
 };
 const mapStateToProps = ({appState, salesExecutives}) => {

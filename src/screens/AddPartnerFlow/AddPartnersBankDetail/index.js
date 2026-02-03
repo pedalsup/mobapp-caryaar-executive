@@ -1,8 +1,7 @@
-import {theme} from '@caryaar/components';
+import {theme, Loader} from '@caryaar/components';
 import {get} from 'lodash';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../../components';
 import {
   settlementPreference,
   settlementPreferenceOptions,
@@ -10,8 +9,10 @@ import {
 import ScreenNames from '../../../constants/ScreenNames';
 import {
   getScreenParam,
+  navigate,
   navigateAndSimpleResetWithParam,
   navigateToTab,
+  resetToPartnerDetail,
 } from '../../../navigation/NavigationUtils';
 import {
   createPartnerThunk,
@@ -24,6 +25,7 @@ import {showToast} from '../../../utils/helper';
 import {formatPartnerPayload} from '../../../utils/partnerHelpers';
 import Partner_Bank_Detail_Component from './Partner_Bank_Detail_Component';
 import {validateField, handleFieldChange} from '../../../utils/inputHelper';
+import {CommonActions} from '@react-navigation/native';
 
 class AddPartnersBankDetail extends Component {
   constructor(props) {
@@ -94,17 +96,17 @@ class AddPartnersBankDetail extends Component {
       fromScreen,
     } = this.state;
 
-    const isFormValid = this.validateAllFields();
-
-    if (!isFormValid) {
+    // 1️⃣ Validate form
+    if (!this.validateAllFields()) {
       showToast('error', 'Required field cannot be empty.', 'bottom', 3500);
       return;
     }
 
-    let bankingDetail = {
+    // 2️⃣ Prepare banking details
+    const bankingDetail = {
       accountNumber,
       accountHolderName,
-      bankName: bankName,
+      bankName,
       ifscCode,
       branchName,
       settlementPreference: selectedTransferMode,
@@ -112,46 +114,155 @@ class AddPartnersBankDetail extends Component {
 
     this.props.setBankingDetails(bankingDetail);
 
+    // 3️⃣ Prepare request payload
     const requestPayload = formatPartnerPayload(partnerForm, bankingDetail);
 
+    this.setState({loading: true});
+
+    const stopLoading = () => this.setState({loading: false});
+
+    // 4️⃣ Update flow (Edit Partner)
     if (fromScreen) {
-      let partnerID = selectedPartner.id;
-      delete requestPayload.documents;
-      delete requestPayload.sellerType;
-      delete requestPayload.partnerType;
-      delete requestPayload.isMultiUser;
-      delete requestPayload.partnerRole;
+      const partnerID = selectedPartner?.id;
+
+      [
+        'documents',
+        'sellerType',
+        'partnerType',
+        'isMultiUser',
+        'partnerRole',
+      ].forEach(key => delete requestPayload[key]);
+
       this.props.updatePartnerThunk(
         partnerID,
         requestPayload,
         onSuccess => {
-          showToast('success', onSuccess.message);
+          stopLoading();
+
           if (onSuccess?.success) {
+            showToast('success', onSuccess.message);
             navigateToTab(ScreenNames.Partners);
+
+            // TODO if from edit detail flow then un comment bellow code
+            // this.props.navigation.dispatch(
+            //   CommonActions.reset({
+            //     index: 1,
+            //     routes: [
+            //       {
+            //         name: ScreenNames.HomeTab,
+            //         state: {
+            //           index: 0,
+            //           routes: [{name: ScreenNames.Partners}],
+            //         },
+            //       },
+            //       {
+            //         name: ScreenNames.PartnerDetail,
+            //         params: {
+            //           partnerId: partnerID, // or from API
+            //         },
+            //       },
+            //     ],
+            //   }),
+            // );
           }
         },
-        error => {},
+        stopLoading,
       );
       return;
     }
 
+    // 5️⃣ Create flow (New Partner)
     this.props.createPartnerThunk(
       requestPayload,
       onSuccess => {
+        stopLoading();
+
         if (onSuccess?.success) {
           navigateAndSimpleResetWithParam(
             ScreenNames.PartnerRegistrationSuccess,
+            0,
             {
               params: {
-                partnerId: onSuccess?.data?.partnerId,
+                partnerId: onSuccess?.data?.partnerId || onSuccess?.data?.id,
               },
             },
           );
         }
       },
-      onFail => {},
+      stopLoading,
     );
   };
+
+  // handleSubmitPress = () => {
+  //   const {partnerForm, selectedPartner} = this.props;
+  //   const {
+  //     accountNumber,
+  //     accountHolderName,
+  //     bankName,
+  //     ifscCode,
+  //     branchName,
+  //     selectedTransferMode,
+  //     fromScreen,
+  //   } = this.state;
+
+  //   const isFormValid = this.validateAllFields();
+
+  //   if (!isFormValid) {
+  //     showToast('error', 'Required field cannot be empty.', 'bottom', 3500);
+  //     return;
+  //   }
+
+  //   let bankingDetail = {
+  //     accountNumber,
+  //     accountHolderName,
+  //     bankName: bankName,
+  //     ifscCode,
+  //     branchName,
+  //     settlementPreference: selectedTransferMode,
+  //   };
+
+  //   this.props.setBankingDetails(bankingDetail);
+
+  //   const requestPayload = formatPartnerPayload(partnerForm, bankingDetail);
+
+  //   if (fromScreen) {
+  //     let partnerID = selectedPartner.id;
+  //     delete requestPayload.documents;
+  //     delete requestPayload.sellerType;
+  //     delete requestPayload.partnerType;
+  //     delete requestPayload.isMultiUser;
+  //     delete requestPayload.partnerRole;
+  //     this.props.updatePartnerThunk(
+  //       partnerID,
+  //       requestPayload,
+  //       onSuccess => {
+  //         showToast('success', onSuccess.message);
+  //         if (onSuccess?.success) {
+  //           navigateToTab(ScreenNames.Partners);
+  //         }
+  //       },
+  //       error => {},
+  //     );
+  //     return;
+  //   }
+
+  //   this.props.createPartnerThunk(
+  //     requestPayload,
+  //     onSuccess => {
+  //       if (onSuccess?.success) {
+  //         navigateAndSimpleResetWithParam(
+  //           ScreenNames.PartnerRegistrationSuccess,
+  //           {
+  //             params: {
+  //               partnerId: onSuccess?.data?.partnerId,
+  //             },
+  //           },
+  //         );
+  //       }
+  //     },
+  //     onFail => {},
+  //   );
+  // };
 
   onSelectBank = (item, index) => {
     this.handleInputChange('bankName', item?.bank);
@@ -234,6 +345,12 @@ class AddPartnersBankDetail extends Component {
     );
   };
 
+  onIFSCCodeChange = text => {
+    const upper = text.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    this.handleInputChange('ifscCode', upper);
+    this.handleInputChange('branchName', '');
+  };
+
   render() {
     const {
       selectedTransferMode,
@@ -245,7 +362,7 @@ class AddPartnersBankDetail extends Component {
       errors,
       loading,
     } = this.state;
-    const {isLoading, selectedPartner} = this.props;
+    const {selectedPartner} = this.props;
 
     return (
       <>
@@ -262,10 +379,7 @@ class AddPartnersBankDetail extends Component {
             this.handleInputChange('accountHolderName', value)
           }
           onBankNamePress={value => this.handleInputChange('bankName', value)}
-          onIFSCCodeChange={value => {
-            this.handleInputChange('ifscCode', value.toUpperCase());
-            this.handleInputChange('branchName', '');
-          }}
+          onIFSCCodeChange={this.onIFSCCodeChange}
           onSelectBank={this.onSelectBank}
           restInputProps={{
             accountNumber: {
@@ -285,6 +399,9 @@ class AddPartnersBankDetail extends Component {
               rightLabel: 'VERIFY',
               rightLabelColor: theme.colors.primary,
               rightLabelPress: this.verifyBankDetailsByIFSC,
+              autoCapitalize: 'characters',
+              autoCorrect: false,
+              autoComplete: 'off',
             },
             bankName: {
               value: bankName,
@@ -307,8 +424,8 @@ class AddPartnersBankDetail extends Component {
           isNewPartner={
             !selectedPartner || Object.keys(selectedPartner).length === 0
           }
+          loading={loading}
         />
-        {isLoading || (loading && <Loader visible={isLoading || loading} />)}
       </>
     );
   }

@@ -1,6 +1,10 @@
 import {fetchNotifications, markAllNotificationsRead} from '../../services';
 import {showApiErrorToast} from '../../utils/helper';
-import types from './types';
+import {
+  CLEAR_NOTIFICATIONS,
+  FETCH_NOTIFICATIONS,
+  MARK_ALL_NOTIFICATIONS_READ,
+} from './actionType';
 
 /**
  * Thunk to fetch notifications.
@@ -12,18 +16,18 @@ import types from './types';
  */
 export const fetchNotificationsThunk = (onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.NOTIFICATIONS_REQUEST});
+    dispatch({type: FETCH_NOTIFICATIONS.REQUEST});
 
     try {
       const response = await fetchNotifications();
       dispatch({
-        type: types.NOTIFICATIONS_SUCCESS,
+        type: FETCH_NOTIFICATIONS.SUCCESS,
         payload: response,
       });
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.NOTIFICATIONS_FAILURE,
+        type: FETCH_NOTIFICATIONS.FAILURE,
         payload: error,
       });
       showApiErrorToast(error);
@@ -39,7 +43,7 @@ export const fetchNotificationsThunk = (onSuccess, onFailure) => {
  * @returns {Object} Redux action with type `CLEAR_NOTIFICATIONS`
  */
 export const clearNotifications = () => ({
-  type: types.CLEAR_NOTIFICATIONS,
+  type: CLEAR_NOTIFICATIONS,
 });
 
 /**
@@ -52,17 +56,17 @@ export const clearNotifications = () => ({
  */
 export const markAllNotificationsReadThunk = (onSuccess, onFailure) => {
   return async dispatch => {
-    dispatch({type: types.NOTIFICATIONS_REQUEST});
+    dispatch({type: MARK_ALL_NOTIFICATIONS_READ.REQUEST});
 
     try {
       const response = await markAllNotificationsRead();
       dispatch({
-        type: types.NOTIFICATION_MARK_ALL_READ,
+        type: MARK_ALL_NOTIFICATIONS_READ.SUCCESS,
       });
       onSuccess?.(response);
     } catch (error) {
       dispatch({
-        type: types.NOTIFICATIONS_FAILURE,
+        type: MARK_ALL_NOTIFICATIONS_READ.FAILURE,
         payload: error,
       });
       showApiErrorToast(error);

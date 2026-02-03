@@ -65,7 +65,10 @@ const AccordionItem = ({item, isExpanded, onPress}) => (
   <>
     <Card padding={16} noShadow={true} onPress={onPress}>
       <View style={styles.header}>
-        <Text size={'small'} hankenGroteskSemiBold={isExpanded}>
+        <Text
+          size={'small'}
+          hankenGroteskSemiBold={!isExpanded}
+          hankenGroteskBold={isExpanded}>
           {item.question}
         </Text>
         <Image

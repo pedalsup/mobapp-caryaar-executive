@@ -38,14 +38,12 @@ class Login extends Component {
   render() {
     const {mobileNumber} = this.state;
     return (
-      <>
-        <Login_Component
-          mobileNumber={mobileNumber}
-          setMobileNumber={this.setMobileNumber}
-          generateOTP={this.generateOTP}
-          isError={this.state.isError}
-        />
-      </>
+      <Login_Component
+        mobileNumber={mobileNumber}
+        setMobileNumber={this.setMobileNumber}
+        generateOTP={this.generateOTP}
+        isError={this.state.isError}
+      />
     );
   }
 }

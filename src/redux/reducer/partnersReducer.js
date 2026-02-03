@@ -1,5 +1,13 @@
+import {PARTNER_TAB_OPTIONS} from '../../constants/enums';
 import {types} from '../actions';
-import {SET_IS_EXISTING_PARTNER} from '../actions/actionType';
+import {
+  CLEAR_SEARCH_RESULTS,
+  CREATE_PARTNER,
+  FETCH_PARTNER_BY_ID,
+  FETCH_PARTNERS,
+  SET_IS_EXISTING_PARTNER,
+  SET_PARTNER_ACTIVE_TAB,
+} from '../actions/actionType';
 
 const initialState = {
   loading: false,
@@ -19,46 +27,32 @@ const initialState = {
   searchTotalPages: 0, // 1
   selectedPartnerId: null,
   isExistingPartner: false,
+  activeTab: PARTNER_TAB_OPTIONS[0],
+  totalPage: 1,
+  page: 1,
 };
 
 const partnersReducer = (state = initialState, action) => {
   switch (action.type) {
-    case types.FETCH_PARTNERS_REQUEST:
-    case types.CREATE_PARTNER_REQUEST:
+    case CREATE_PARTNER.REQUEST:
     case types.UPDATE_PARTNER_REQUEST:
-    case types.SEARCH_PARTNER_REQUEST:
-      return {
-        ...state,
-        loading: true,
-      };
-    case types.FETCH_PARTNER_REQUEST:
+    case FETCH_PARTNER_BY_ID.REQUEST:
+    case FETCH_PARTNERS.REQUEST:
       return {
         ...state,
         loading: true,
       };
 
-    case types.FETCH_PARTNERS_FAILURE:
-    case types.FETCH_PARTNER_FAILURE:
-    case types.CREATE_PARTNER_FAILURE:
+    case FETCH_PARTNER_BY_ID.FAILURE:
+    case CREATE_PARTNER.FAILURE:
     case types.UPDATE_PARTNER_FAILURE:
-    case types.SEARCH_PARTNER_FAILURE:
+    case FETCH_PARTNERS.FAILURE:
       return {
         ...state,
-        loading: false,
-      };
-    case types.FETCH_PARTNERS_SUCCESS:
-      return {
-        ...state,
-        partnersList:
-          action.payload.page === 1
-            ? action.payload.data
-            : [...state.partnersList, ...action.payload.data],
-        currentPage: action.payload.page,
-        totalPages: action.payload.totalPages,
         loading: false,
       };
 
-    case types.FETCH_PARTNER_SUCCESS:
+    case FETCH_PARTNER_BY_ID.SUCCESS:
       return {
         ...state,
         selectedPartner: action.payload,
@@ -72,7 +66,7 @@ const partnersReducer = (state = initialState, action) => {
         selectedPartnerId: null,
         loading: false,
       };
-    case types.CREATE_PARTNER_SUCCESS:
+    case CREATE_PARTNER.SUCCESS:
       return {
         ...state,
         // partnersList: [action.payload.data, ...state.partnersList],
@@ -88,54 +82,8 @@ const partnersReducer = (state = initialState, action) => {
         success: action.payload.success,
         loading: false,
       };
-    case types.SEARCH_PARTNER_SUCCESS:
-      return {
-        ...state,
-        searchPartners:
-          action.payload.page === 1
-            ? action.payload.data
-            : [...state.searchPartners, ...action.payload.data],
-        loading: false,
-        message: action.payload.message,
-        success: action.payload.success,
-        searchPage: action.payload.page,
-        searchTotalPages: action.payload.totalPages,
-      };
 
-    case types.FETCH_ACTIVE_PARTNERS_REQUEST:
-      return {...state, loading: true};
-
-    case types.FETCH_ACTIVE_PARTNERS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        activePartners:
-          action.payload.page === 1
-            ? action.payload.data
-            : [...state.activePartners, ...action.payload.data],
-        activePage: action.payload.page,
-        activeTotalPages: action.payload.totalPages,
-      };
-
-    case types.FETCH_PENDING_PARTNERS_REQUEST:
-      return {...state, loading: true};
-
-    case types.FETCH_PENDING_PARTNERS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        pendingPartners:
-          action.payload.page === 1
-            ? action.payload.data
-            : [...state.pendingPartners, ...action.payload.data],
-        pendingPage: action.payload.page,
-        pendingTotalPages: action.payload.totalPages,
-      };
-
-    case types.FETCH_ACTIVE_PARTNERS_FAILURE:
-    case types.FETCH_PENDING_PARTNERS_FAILURE:
-      return {...state, loading: false};
-    case types.CLEAR_SEARCH_PARTNERS:
+    case CLEAR_SEARCH_RESULTS.SUCCESS:
       return {
         ...state,
         searchPartners: [],
@@ -146,6 +94,53 @@ const partnersReducer = (state = initialState, action) => {
 
     case SET_IS_EXISTING_PARTNER.SUCCESS:
       return {...state, isExistingPartner: action.payload};
+
+    case SET_PARTNER_ACTIVE_TAB.SUCCESS:
+      return {...state, activeTab: action.payload};
+
+    case FETCH_PARTNERS.SUCCESS:
+      const {
+        applications,
+        pagination: {page, totalPages},
+        isSearch,
+        isPending,
+      } = action.payload;
+
+      if (isSearch) {
+        return {
+          ...state,
+          loading: false,
+          searchPage: page,
+          searchTotalPages: totalPages,
+          searchPartners:
+            page > 1
+              ? [...state.searchPartners, ...applications]
+              : applications,
+        };
+      }
+      if (isPending) {
+        return {
+          ...state,
+          loading: false,
+          pendingPartners:
+            page > 1
+              ? [...state.pendingPartners, ...applications]
+              : applications,
+          page,
+          totalPage: totalPages,
+        };
+      } else {
+        return {
+          ...state,
+          loading: false,
+          activePartners:
+            page > 1
+              ? [...state.activePartners, ...applications]
+              : applications,
+          page,
+          totalPage: totalPages,
+        };
+      }
 
     case types.RESET_APP_STATE:
       return initialState;

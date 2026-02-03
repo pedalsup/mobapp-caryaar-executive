@@ -46,6 +46,7 @@ class AddPartnerBasicDetail extends Component {
     const {basicDetail, route} = this.props;
     let navState = getScreenParam(route, 'params', null);
     let fromScreen = get(navState, 'fromScreen', false);
+    console.log({fromScreen});
     if (fromScreen) {
       this.setState({
         showImages: get(navState, 'showImages', []),
@@ -56,8 +57,8 @@ class AddPartnerBasicDetail extends Component {
       fromScreen: fromScreen,
       businessName: get(basicDetail, 'businessName', ''),
       businessType: get(basicDetail, 'businessType', ''),
-      yearsInBusiness: get(basicDetail, 'yearInBusiness', ''),
-      monthlyCarSales: get(basicDetail, 'monthlyCarSale', ''),
+      yearsInBusiness: get(basicDetail, 'yearInBusiness', '')?.toString(),
+      monthlyCarSales: get(basicDetail, 'monthlyCarSale', '')?.toString(),
       ownerName: get(basicDetail, 'ownerName', ''),
       mobileNumber: get(basicDetail, 'ownerMobileNumber', ''),
       emailAddress: get(basicDetail, 'ownerEmail', ''),
@@ -93,6 +94,8 @@ class AddPartnerBasicDetail extends Component {
     } = this.state;
     const isFormValid = this.validateAllFields();
     const {selectedPartnerId, isExistingPartner} = this.props;
+
+    console.log({navigationParams});
 
     if (!isFormValid) {
       showToast('warning', 'Required field cannot be empty.', 'bottom', 3000);

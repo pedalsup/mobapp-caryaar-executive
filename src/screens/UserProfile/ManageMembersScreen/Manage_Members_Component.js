@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   Button,
   Card,
@@ -11,24 +12,32 @@ import {
   Text,
   theme,
   Dropdown,
+  Loader,
+  PaginationFooter,
 } from '@caryaar/components';
-import React from 'react';
+import React, {useRef} from 'react';
+
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  Keyboard,
   StyleSheet,
   View,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import {
+  DeleteConfirmationContent,
   InitialsAvatar,
-  Loader,
   NoDataFound,
-  PaginationFooter,
 } from '../../../components';
 import {getLabelFromEnum, salesExecutiveValue} from '../../../constants/enums';
 import {goBack} from '../../../navigation/NavigationUtils';
 import {formatMobileNumber} from '../../../utils/helper';
+import strings from '../../../locales/strings';
+import {useInputRefs} from '../../../utils/useInputRefs';
 
 const Manage_Members_Component = ({
   handleAddNewMemberPress,
@@ -54,8 +63,18 @@ const Manage_Members_Component = ({
   currentPage,
   totalPages,
   loadingMore,
+  deleteModalProp,
 }) => {
   const [showDropdown, setShowDropdown] = React.useState(false);
+  const inputRefs = useRef({});
+  const scrollRef = useRef(null);
+
+  const {refs, focusNext, scrollToInput} = useInputRefs([
+    'fullName',
+    'email',
+    'mobileNumber',
+    'salesExecutivePosition',
+  ]);
 
   const renderItem = ({item, index}) => (
     <>
@@ -90,7 +109,9 @@ const Manage_Members_Component = ({
             {formatMobileNumber(item?.user?.mobileNumber)}
           </Text>
         </View>
-        <Pressable onPress={() => handleDeleteMemberPress?.(item, index)}>
+        <Pressable
+          onPress={() => handleDeleteMemberPress?.(item, index)}
+          hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
           <Image source={images.icon_delete} style={styles.deleteIcon} />
         </Pressable>
       </Card>
@@ -124,7 +145,7 @@ const Manage_Members_Component = ({
             loading={isLoading}
             currentPage={currentPage}
             totalPages={totalPages}
-            footerMessage={'All members loaded.'}
+            footerMessage={'You’ve reached the end!'}
           />
         }
       />
@@ -132,73 +153,110 @@ const Manage_Members_Component = ({
         isVisible={isVisible}
         onModalHide={handleModalHide}
         primaryButtonLabel={'Send Invite'}
-        isScrollableContent={true}
-        isPrimaryButtonVisible={true}
-        modalHeight={'75%'}
+        isScrollableContent={false}
+        isPrimaryButtonVisible={false}
+        modalHeight={'70%'}
         onPressPrimaryButton={onPressPrimaryButton}
         title="Add New Member">
-        <View style={styles.modalContent}>
-          {isLoading && (
-            <View style={styles.loaderOverlay}>
-              <ActivityIndicator size={'large'} />
-            </View>
-          )}
-          <Input
-            label="Full Name"
-            value={fullName}
-            onChangeText={onChangeFullName}
-            onFocus={() => {
-              setShowDropdown(false);
-            }}
-            {...(restInputProps.fullName || {})}
-          />
-          <Spacing size="lg" />
-          <Input
-            label="Mobile Number"
-            keyboardType="phone-pad"
-            value={mobileNumber}
-            onChangeText={onChangeMobileNumber}
-            maxLength={10}
-            onFocus={() => {
-              setShowDropdown(false);
-            }}
-            {...(restInputProps.mobileNumber || {})}
-          />
-          <Spacing size="lg" />
-          <Input
-            label="Email"
-            keyboardType="email-address"
-            onChangeText={onChangeEmail}
-            onFocus={() => {
-              setShowDropdown(false);
-            }}
-            {...(restInputProps.email || {})}
-          />
-          <Spacing size="lg" />
-          <Input
-            label="Select Sales Executive Position"
-            keyboardType="default"
-            isRightIconVisible
-            isAsDropdown
-            onPress={() => setShowDropdown(!showDropdown)}
-            value={selectedSalesExec}
-            {...(restInputProps.selectedSalesExec || {})}
-          />
-          <Dropdown
-            options={salesExecOptions}
-            selectedValue={selectedSalesExec}
-            onSelect={item => {
-              setShowDropdown(false);
-              setSelectedSalesExec?.(item);
-            }}
-            isVisible={showDropdown}
-            multiSelect={false}
-          />
-        </View>
+        <KeyboardAvoidingView
+          style={{flexGrow: 1}}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+          <View style={{flex: 0}}>
+            <ScrollView
+              ref={scrollRef}
+              keyboardShouldPersistTaps={'handled'}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.modalContent}>
+              {isLoading && (
+                <View style={styles.loaderOverlay}>
+                  <ActivityIndicator size={'large'} />
+                </View>
+              )}
+              <Input
+                label="Full Name"
+                value={fullName}
+                onChangeText={onChangeFullName}
+                onFocus={() => {
+                  setShowDropdown(false);
+                }}
+                ref={refs.fullName}
+                returnKeyType="next"
+                onSubmitEditing={() => focusNext('mobileNumber')}
+                {...(restInputProps.fullName || {})}
+              />
+              <Spacing size="lg" />
+              <Input
+                ref={refs.mobileNumber}
+                label="Mobile Number"
+                keyboardType="phone-pad"
+                value={mobileNumber}
+                onChangeText={onChangeMobileNumber}
+                maxLength={10}
+                onFocus={() => {
+                  setShowDropdown(false);
+                }}
+                returnKeyType="next"
+                onSubmitEditing={() => focusNext('email')}
+                {...(restInputProps.mobileNumber || {})}
+              />
+              <Spacing size="lg" />
+              <Input
+                ref={refs.email}
+                label="Email"
+                keyboardType="email-address"
+                onChangeText={onChangeEmail}
+                onFocus={() => {
+                  setShowDropdown(false);
+                  scrollToInput('email');
+                }}
+                {...(restInputProps.email || {})}
+              />
+              <Spacing size="lg" />
+              <Input
+                ref={refs?.salesExecutivePosition}
+                label="Select Sales Executive Position"
+                keyboardType="default"
+                isRightIconVisible
+                isAsDropdown
+                onPress={() => {
+                  setShowDropdown(!showDropdown);
+                  Keyboard.dismiss();
+                  scrollToInput('salesExecutivePosition');
+                }}
+                value={selectedSalesExec}
+                {...(restInputProps.selectedSalesExec || {})}
+              />
+              <Dropdown
+                options={salesExecOptions}
+                selectedValue={selectedSalesExec}
+                onSelect={item => {
+                  setShowDropdown(false);
+                  setSelectedSalesExec?.(item);
+                }}
+                isVisible={showDropdown}
+                multiSelect={false}
+              />
+              <Spacing size="lg" />
+
+              <Button label={'Add New Member'} onPress={onPressPrimaryButton} />
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
       </CommonModal>
       <View style={styles.buttonWrapper}>
         <Button label={'Add New Member'} onPress={handleAddNewMemberPress} />
       </View>
+
+      <DeleteConfirmationContent
+        isVisible={deleteModalProp?.isDeleteModalVisible}
+        onModalHide={deleteModalProp?.onModalHide}
+        onPressPrimaryButtonPress={deleteModalProp?.onDeleteMemberConfirm}
+        title={strings.deleteMember}
+        message={strings.deleteMemberConfirmationMessage}
+        isLoading={deleteModalProp?.loading}
+      />
+
       {isLoading && <Loader visible={isLoading} />}
     </SafeAreaWrapper>
   );
@@ -250,6 +308,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     paddingVertical: 15,
+    // paddingBottom: 30,
+    flexGrow: 1,
   },
   buttonWrapper: {
     paddingHorizontal: theme.sizes.padding,

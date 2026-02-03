@@ -1,10 +1,9 @@
 import {images} from '@caryaar/components';
-import {get} from 'lodash';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Loader} from '../../components';
 import {businessTypeValue, getLabelFromEnum} from '../../constants/enums';
 import ScreenNames from '../../constants/ScreenNames';
+import strings from '../../locales/strings';
 import {
   getScreenParam,
   goBack,
@@ -24,6 +23,7 @@ import {
   setSellerType,
   setUserType,
 } from '../../redux/actions';
+import {getPresignedDownloadUrl} from '../../services';
 import {
   buildDocumentsArray,
   viewDocumentHelper,
@@ -31,9 +31,11 @@ import {
 import {
   getLocationText,
   getPartnerAddress,
-  showApiErrorToast,
+  safeGet,
+  showToast,
 } from '../../utils/helper';
 import Partner_Detail_Component from './Partner_Detail_Component';
+import {Linking, Platform} from 'react-native';
 
 class PartnerDetailScreen extends Component {
   constructor(props) {
@@ -72,7 +74,18 @@ class PartnerDetailScreen extends Component {
     goBack();
   };
 
-  viewDocument = async (type, link) => {
+  viewDocument = async (type, uri, isRequest) => {
+    const {isFetchingDocument} = this.state;
+    if (isFetchingDocument.loading) {
+      return;
+    }
+    if (isRequest) {
+      // TODO if required field needs to be requested
+    }
+    if (!uri) {
+      return showToast('error', strings.errorNoDocumentUpload);
+    }
+
     this.setState({
       isFetchingDocument: {
         loading: true,
@@ -80,23 +93,30 @@ class PartnerDetailScreen extends Component {
       },
     });
 
-    await viewDocumentHelper(
-      link,
-      imageUri => {
-        navigate(ScreenNames.ImagePreviewScreen, {uri: imageUri});
-      },
-      () => {
-        showApiErrorToast({message: 'Could not open the document.'});
-      },
-      () => {
-        this.setState({
-          isFetchingDocument: {
-            loading: false,
-            documentType: '',
-          },
-        });
-      },
-    );
+    const downloadUrlResponse = await getPresignedDownloadUrl({
+      objectKey: uri,
+    });
+
+    let downloadedUrl = downloadUrlResponse?.data?.url;
+
+    try {
+      await viewDocumentHelper(
+        downloadedUrl,
+        imageUri => {
+          navigate(ScreenNames.ImagePreviewScreen, {uri: imageUri});
+        },
+        error => {
+          showToast('error', 'Could not open the document.', 'bottom', 3000);
+        },
+      );
+    } finally {
+      this.setState({
+        isFetchingDocument: {
+          loading: false,
+          documentType: '',
+        },
+      });
+    }
   };
 
   onEditPartnerDetail = () => {
@@ -111,89 +131,116 @@ class PartnerDetailScreen extends Component {
     });
   };
 
+  onViewGoogleMapPress = () => {
+    const lat = 23.0225;
+    const lng = 72.5714;
+    const url = Platform.select({
+      ios: `comgooglemaps://?q=${lat},${lng}`,
+      android: `geo:${lat},${lng}?q=${lat},${lng}`,
+    });
+
+    Linking.openURL(url).catch(() => {
+      // fallback to browser
+      const browserUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      Linking.openURL(browserUrl);
+    });
+  };
+
   render() {
     const {selectedPartner} = this.props;
     const {isLoading} = this.state;
     const {owner = {}, bankDetail = {}} = selectedPartner || {};
 
-    const safeGet = (obj, path) => (isLoading ? '-' : get(obj, path, '-'));
-
     return (
-      <>
-        <Partner_Detail_Component
-          onBackPress={this.onBackPress}
-          businessName={safeGet(selectedPartner, 'businessName')}
-          partnerDetail={selectedPartner}
-          contactDetails={[
-            {label: 'Owner', value: safeGet(owner, 'name')},
-            {label: 'Mobile Number', value: safeGet(owner, 'mobileNumber')},
-            {label: 'EmailAddress', value: safeGet(owner, 'email'), full: true},
-          ]}
-          locationDetail={[
-            {
-              label: 'Company Name',
-              value: safeGet(selectedPartner, 'companyName'),
-              full: true,
-            },
-            {
-              label: 'Address',
-              value: getPartnerAddress(selectedPartner),
-              full: true,
-            },
-          ]}
-          accountDetail={[
-            {
-              label: 'Account Number',
-              value: safeGet(bankDetail, 'accountNumber'),
-            },
-            {
-              label: 'Account Holder Name',
-              value: safeGet(bankDetail, 'accountHolderName'),
-            },
-            {label: 'Bank Name', value: safeGet(bankDetail, 'bankName')},
-            {label: 'IFSC Code', value: safeGet(bankDetail, 'ifscCode')},
-            {label: 'Branch Name', value: safeGet(bankDetail, 'branchName')},
-            {
-              label: 'Settlement Preference',
-              value: safeGet(bankDetail, 'settlementPreference'),
-            },
-          ]}
-          documents={buildDocumentsArray(selectedPartner, this.viewDocument)}
-          isFetchingDocument={this.state.isFetchingDocument}
-          businessType={getLabelFromEnum(
-            businessTypeValue,
-            selectedPartner?.businessType,
-          )}
-          infoRowDetails={[
-            {
-              value: safeGet(owner, 'mobileNumber'),
-              icon: images.phoneOutline,
-              color: 'white',
-            },
-            {
-              value: getLocationText(
-                safeGet(selectedPartner, 'city'),
-                safeGet(selectedPartner, 'state'),
-              ),
-              icon: images.locationPin,
-              color: 'white',
-            },
-          ]}
-          footerInfo={[
-            {
-              label: 'Years in Business',
-              value: safeGet(selectedPartner, 'yearInBusiness'),
-            },
-            {
-              label: 'Monthly Car Sales',
-              value: safeGet(selectedPartner, 'monthlyCarSale'),
-            },
-          ]}
-          onEditPartnerDetail={this.onEditPartnerDetail}
-        />
-
-        {isLoading && <Loader visible={isLoading} />}
-      </>
+      <Partner_Detail_Component
+        onBackPress={this.onBackPress}
+        businessName={safeGet(isLoading, selectedPartner, 'businessName')}
+        partnerDetail={selectedPartner}
+        contactDetails={[
+          {label: 'Owner Name', value: safeGet(isLoading, owner, 'name')},
+          {
+            label: 'Mobile Number',
+            value: safeGet(isLoading, owner, 'mobileNumber'),
+          },
+          {
+            label: 'Email Address',
+            value: safeGet(isLoading, owner, 'email'),
+            full: true,
+          },
+        ]}
+        locationDetail={[
+          {
+            label: 'Company Name',
+            value: safeGet(isLoading, selectedPartner, 'companyName'),
+            full: true,
+          },
+          {
+            label: 'Address',
+            value: getPartnerAddress(selectedPartner),
+            full: true,
+          },
+        ]}
+        accountDetail={[
+          {
+            label: 'Account Number',
+            value: safeGet(isLoading, bankDetail, 'accountNumber'),
+          },
+          {
+            label: 'Account Holder Name',
+            value: safeGet(isLoading, bankDetail, 'accountHolderName'),
+          },
+          {
+            label: 'Bank Name',
+            value: safeGet(isLoading, bankDetail, 'bankName'),
+          },
+          {
+            label: 'IFSC Code',
+            value: safeGet(isLoading, bankDetail, 'ifscCode'),
+          },
+          {
+            label: 'Branch Name',
+            value: safeGet(isLoading, bankDetail, 'branchName'),
+          },
+          {
+            label: 'Settlement Preference',
+            value: safeGet(isLoading, bankDetail, 'settlementPreference'),
+          },
+        ]}
+        documents={buildDocumentsArray(selectedPartner, this.viewDocument)}
+        isFetchingDocument={this.state.isFetchingDocument}
+        businessType={getLabelFromEnum(
+          businessTypeValue,
+          selectedPartner?.businessType,
+        )}
+        infoRowDetails={[
+          {
+            value: safeGet(isLoading, owner, 'mobileNumber'),
+            icon: images.phoneOutline,
+            color: 'white',
+          },
+          {
+            value: getLocationText(
+              safeGet(isLoading, selectedPartner, 'city'),
+              safeGet(isLoading, selectedPartner, 'state'),
+            ),
+            icon: images.locationPin,
+            color: 'white',
+          },
+        ]}
+        footerInfo={[
+          {
+            label: 'Years in Business',
+            value: safeGet(isLoading, selectedPartner, 'yearInBusiness'),
+          },
+          {
+            label: 'Monthly Car Sales',
+            value: safeGet(isLoading, selectedPartner, 'monthlyCarSale'),
+          },
+        ]}
+        onEditPartnerDetail={this.onEditPartnerDetail}
+        isLoading={isLoading}
+        onViewGoogleMapPress={this.onViewGoogleMapPress}
+      />
     );
   }
 }

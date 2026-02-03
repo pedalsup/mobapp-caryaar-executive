@@ -1,139 +1,159 @@
-/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+
 import {
   Card,
   Header,
+  Loader,
   SafeAreaWrapper,
   Spacing,
   Text,
   theme,
 } from '@caryaar/components';
-import React from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 
+import {NoDataFound} from '../../components';
+import {formatDate} from '../../utils/helper';
 import {goBack} from '../../navigation/NavigationUtils';
 
-const steps = [
-  'Vehicle onboarding',
-  'Customer onboarding',
-  'Lender selection',
-  'Credit - Document verification & approval',
-  'Lender submission',
-  'Lender approval',
-  'DO released',
-  'Ops verifies the DO',
-  'Loan disbursement',
-  'Collection of RC & other docs by PDA',
-  'RTO charge calculation',
-  'Customer agrees to the RTO charges',
-  'Ops ledgers all the invoices',
-  'Finance team transfers the amount',
-  'RC transfer is complete',
-  'Ops verifies the RC transfer & approves',
-  'Held back amount is now released',
-  'Finance marks the ticket as closed',
-];
-
-const completedCount = 12;
-
-export default function LoanTrackingScreen({navigation}) {
+const LoanTrackingScreen = ({
+  navigation,
+  loading,
+  trackingSteps,
+  loanApplicationId,
+}) => {
   const handleStepPress = (step, index) => {
     // navigation.navigate('StepDetail', { step, index });
   };
 
-  return (
-    <SafeAreaWrapper backgroundColor={theme.colors.background}>
-      <Header title="Loan Application Tracking" onBackPress={() => goBack()} />
-      <View
-        style={{
-          padding: theme.sizes.padding,
-          backgroundColor: theme.colors.background,
-        }}>
-        <Text style={styles.trackingId}>
-          Tracking ID <Text style={styles.id}>#LA0001</Text>
-        </Text>
-        <Spacing size="md" />
-        <Card padding={0} cardContainerStyle={{height: '93%'}}>
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            showsVerticalScrollIndicator={false}>
-            <View style={styles.timeline}>
-              {steps.map((step, index) => {
-                const completed = index < completedCount;
-                const isLast = index === steps.length - 1;
+  const hasData = trackingSteps?.length > 0;
 
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => handleStepPress(step, index)}
-                    activeOpacity={0.7}>
-                    <View
-                      style={[
-                        styles.stepContainer,
-                        !isLast && styles.stepContainerBorder,
-                      ]}>
-                      <View style={styles.markerWrapper}>
-                        <View
-                          style={[
-                            styles.circle,
-                            completed
-                              ? styles.circleCompleted
-                              : styles.circlePending,
-                          ]}
-                        />
-                        {!isLast && (
+  return (
+    <SafeAreaWrapper>
+      <Header title="Loan Application Tracking" onBackPress={goBack} />
+
+      <View style={styles.container}>
+        <Text>
+          Tracking ID{' '}
+          <Text hankenGroteskBold color={'#FFA500'}>
+            {loanApplicationId}
+          </Text>
+        </Text>
+
+        {hasData ? (
+          <Card
+            padding={0}
+            cardContainerStyle={{marginVertical: theme.sizes.spacing.smd}}>
+            <ScrollView
+              contentContainerStyle={styles.scroll}
+              showsVerticalScrollIndicator={false}>
+              <View style={styles.timeline}>
+                {trackingSteps.map((item, index) => {
+                  const completed = true; // TODO: replace with real condition
+                  const isLast = index === trackingSteps.length - 1;
+
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      activeOpacity={0.7}
+                      onPress={() => handleStepPress(item, index)}>
+                      <View
+                        style={[
+                          styles.stepContainer,
+                          !isLast && styles.stepContainerBorder,
+                          isLast && styles.lastStep,
+                        ]}>
+                        <View style={styles.markerWrapper}>
                           <View
                             style={[
-                              styles.verticalLine,
+                              styles.circle,
                               completed
-                                ? styles.lineCompleted
-                                : styles.linePending,
+                                ? styles.circleCompleted
+                                : styles.circlePending,
                             ]}
                           />
-                        )}
-                      </View>
 
-                      <View style={styles.textContainer}>
-                        <Text
-                          style={[
-                            styles.stepText,
-                            completed ? styles.textDone : styles.textPending,
-                            isLast && !completed && styles.finalNote,
-                          ]}>
-                          {step}
-                        </Text>
-                        {completed && (
-                          <Text style={styles.timestamp}>
-                            12 Jan 2025, 3:30 PM
+                          {!isLast && (
+                            <View
+                              style={[
+                                styles.verticalLine,
+                                completed
+                                  ? styles.lineCompleted
+                                  : styles.linePending,
+                              ]}
+                            />
+                          )}
+                        </View>
+
+                        <View style={styles.textContainer}>
+                          <Text
+                            type="helper-text"
+                            style={[
+                              completed ? styles.textDone : styles.textPending,
+                              isLast && styles.finalNote,
+                            ]}>
+                            {item?.recentActivity?.description}
                           </Text>
-                        )}
+
+                          <Text
+                            size="caption"
+                            color={theme.colors.gray500}
+                            style={styles.timestamp}>
+                            {formatDate(
+                              item?.createdAt,
+                              'DD MMM YYYY, hh:mm A',
+                            )}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </ScrollView>
-        </Card>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </Card>
+        ) : (
+          !loading && <NoDataFound />
+        )}
+
         <Spacing size="xl" />
       </View>
+
+      {loading && <Loader visible />}
     </SafeAreaWrapper>
   );
-}
+};
 
 const CIRCLE_SIZE = 14;
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
-  header: {backgroundColor: '#000', padding: 16},
-  title: {color: '#fff', fontSize: 18, fontWeight: '600'},
-  id: {color: '#FFA500'},
-  scroll: {flexGrow: 1, padding: 12},
-  timeline: {paddingLeft: 0},
+  container: {
+    flex: 1,
+    padding: theme.sizes.padding,
+    backgroundColor: theme.colors.background,
+  },
+
+  scroll: {
+    flexGrow: 1,
+    padding: 12,
+  },
+
+  timeline: {
+    paddingLeft: 0,
+  },
 
   stepContainer: {
     flexDirection: 'row',
-    marginBottom: 32,
+    marginBottom: 15,
     alignItems: 'flex-start',
+  },
+  stepContainerBorder: {
+    // borderBottomWidth: 1,
+    // borderBottomColor: '#e5e7eb',
+    // paddingBottom: 20, // Border under the nite
+  },
+
+  lastStep: {
+    marginBottom: 0,
   },
 
   markerWrapper: {
@@ -163,7 +183,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: CIRCLE_SIZE + 2,
     width: 2,
-    height: 60,
+    height: '100%',
   },
 
   lineCompleted: {
@@ -179,16 +199,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  stepText: {
-    fontSize: 15,
-    fontWeight: '500',
+  textDone: {
+    color: theme.colors.black,
   },
 
-  textDone: {color: '#000'},
-  textPending: {color: '#9ca3af'},
+  textPending: {
+    color: '#9ca3af',
+  },
+
   timestamp: {
-    fontSize: 12,
-    color: '#6b7280',
     marginTop: 4,
   },
 
@@ -197,9 +216,6 @@ const styles = StyleSheet.create({
     color: '#16a34a',
     marginTop: 4,
   },
-  stepContainerBorder: {
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#e5e7eb',
-    // paddingBottom: 20,
-  },
 });
+
+export default LoanTrackingScreen;

@@ -4,21 +4,25 @@ import {
   CardWrapper,
   DetailInfoCard,
   Header,
+  Loader,
   PartnerCard,
   SafeAreaWrapper,
   Spacing,
   Text,
   TextAreaInput,
   theme,
+  FullLoader,
 } from '@caryaar/components';
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
-import {Loader} from '../../components';
 import {getApplicationStatusLabel} from '../../constants/enums';
-import {getGradientColors} from '../../utils/helper';
-import DocumentList from './DocumentList';
 import {goBack} from '../../navigation/NavigationUtils';
+import {
+  getApplicationGradientColors,
+  getApplicationStatusColor,
+} from '../../utils/helper';
+import DocumentList from './DocumentList';
 
 const Application_Detail_Component = ({
   onBackPress,
@@ -35,13 +39,13 @@ const Application_Detail_Component = ({
   submittedOn,
   processingTime,
   lastUpdatedOn,
-  loanDocuments,
   kycDocuments,
   onDocumentPress,
   documentType,
   additionalNotes,
   contactCustomer,
   contactPartner,
+  documentList,
 }) => {
   return (
     <SafeAreaWrapper backgroundColor={theme.colors.background}>
@@ -54,7 +58,8 @@ const Application_Detail_Component = ({
             isStatusBold
             leftText={loanApplicationId}
             status={getApplicationStatusLabel(loanStatus)?.toUpperCase()}
-            gradientColors={getGradientColors(loanStatus)}>
+            statusTextColor={getApplicationStatusColor(loanStatus)}
+            gradientColors={getApplicationGradientColors(loanStatus)}>
             <PartnerCard
               noMargin
               showRightArrow={false}
@@ -79,18 +84,11 @@ const Application_Detail_Component = ({
           <Spacing size="lg" />
           <DetailInfoCard label={'Documents'} isSemiBold={false}>
             <DocumentList
-              viewPanCard={viewPanCard}
-              isLoading={isLoading}
+              // isLoading={isLoading}
               documentType={documentType}
-              // kycDocuments={kycDocuments} // TODO remove this comment and delete kycDocuments object
-              kycDocuments={{
-                aadharFrontPhoto:
-                  'https://www.aeee.in/wp-content/uploads/2020/08/Sample-pdf.pdf',
-                aadharBackphoto: 'https://picsum.photos/200/300',
-                pancardPhoto: '',
-              }}
-              loanDocuments={loanDocuments}
+              kycDocuments={kycDocuments}
               onDocumentPress={onDocumentPress}
+              loanDocumentList={documentList}
             />
           </DetailInfoCard>
           <Spacing size="lg" />
@@ -124,6 +122,7 @@ const Application_Detail_Component = ({
           </View>
         </View>
       </ScrollView>
+      {isLoading && <FullLoader visible={isLoading} />}
       {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );

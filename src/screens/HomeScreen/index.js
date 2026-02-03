@@ -1,13 +1,18 @@
 import React, {Component} from 'react';
 import Home_Component from './Home_Component';
-import {navigate} from '../../navigation/NavigationUtils';
+import {navigate, navigateToTab} from '../../navigation/NavigationUtils';
 import ScreenNames from '../../constants/ScreenNames';
 import {connect} from 'react-redux';
-import {resetRegistration, resetPartnerDetail} from '../../redux/actions';
+import {
+  resetRegistration,
+  resetPartnerDetail,
+  setPartnerActiveTab,
+} from '../../redux/actions';
 import {
   fetchPartnerPerformancesThunk,
   fetchPartnerStatsThunk,
 } from '../../redux/actions';
+import {PARTNER_TAB_OPTIONS} from '../../constants/enums';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -52,21 +57,36 @@ class HomeScreen extends Component {
     this.fetchPartnerPerformances(true);
   };
 
+  onActivePartnerPress = () => {
+    //PARTNER_TAB_OPTIONS
+    this.props.setPartnerActiveTab(PARTNER_TAB_OPTIONS[0]);
+    navigateToTab(ScreenNames.Partners);
+  };
+
+  onPendingApprovalPress = () => {
+    navigateToTab(ScreenNames.Applications);
+  };
+
+  onLoanApprovedPress = () => {
+    navigateToTab(ScreenNames.Applications);
+  };
+
   render() {
     const {partnerPerformances, loading, partnerStats} = this.props;
     const {refreshing} = this.state;
     return (
-      <>
-        <Home_Component
-          onRightIconPress={this.onRightIconPress}
-          onAddPartner={this.onAddPartner}
-          partnerPerformances={partnerPerformances}
-          loading={loading && !refreshing}
-          onRefresh={this.onRefresh}
-          refreshing={refreshing}
-          partnerStats={partnerStats}
-        />
-      </>
+      <Home_Component
+        onRightIconPress={this.onRightIconPress}
+        onAddPartner={this.onAddPartner}
+        partnerPerformances={partnerPerformances}
+        loading={loading && !refreshing}
+        onRefresh={this.onRefresh}
+        refreshing={refreshing}
+        partnerStats={partnerStats}
+        onActivePartnerPress={this.onActivePartnerPress}
+        onPendingApprovalPress={this.onPendingApprovalPress}
+        onLoanApprovedPress={this.onLoanApprovedPress}
+      />
     );
   }
 }
@@ -76,6 +96,7 @@ const mapDispatchToProps = {
   resetPartnerDetail,
   fetchPartnerPerformancesThunk,
   fetchPartnerStatsThunk,
+  setPartnerActiveTab,
 };
 const mapStateToProps = ({partnerPerformance}) => {
   return {

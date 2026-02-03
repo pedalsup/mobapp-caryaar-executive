@@ -4,6 +4,7 @@ import {
   Header,
   AccountDetailsForm,
   theme,
+  Loader,
 } from '@caryaar/components';
 import React from 'react';
 import {StyleSheet} from 'react-native';
@@ -26,6 +27,7 @@ const Partner_Bank_Detail_Component = ({
   errorSteps,
   searchBankNameFromAPI = () => {},
   isNewPartner,
+  loading,
 }) => {
   return (
     <SafeAreaWrapper>
@@ -55,6 +57,7 @@ const Partner_Bank_Detail_Component = ({
         onSelectSuggestion={onSelectBank}
         searchBankNameFromAPI={searchBankNameFromAPI}
       />
+      {loading && <Loader visible={loading} />}
     </SafeAreaWrapper>
   );
 };
