@@ -7,12 +7,13 @@ import {
   resetRegistration,
   resetPartnerDetail,
   setPartnerActiveTab,
+  setLoanFilterFromHomePage,
 } from '../../redux/actions';
 import {
   fetchPartnerPerformancesThunk,
   fetchPartnerStatsThunk,
 } from '../../redux/actions';
-import {PARTNER_TAB_OPTIONS} from '../../constants/enums';
+import {applicationStatus, PARTNER_TAB_OPTIONS} from '../../constants/enums';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -65,10 +66,12 @@ class HomeScreen extends Component {
 
   onPendingApprovalPress = () => {
     navigateToTab(ScreenNames.Applications);
+    this.props.setLoanFilterFromHomePage(applicationStatus.IN_REVIEW);
   };
 
   onLoanApprovedPress = () => {
     navigateToTab(ScreenNames.Applications);
+    this.props.setLoanFilterFromHomePage(applicationStatus.APPROVED);
   };
 
   render() {
@@ -97,6 +100,7 @@ const mapDispatchToProps = {
   fetchPartnerPerformancesThunk,
   fetchPartnerStatsThunk,
   setPartnerActiveTab,
+  setLoanFilterFromHomePage,
 };
 const mapStateToProps = ({partnerPerformance}) => {
   return {

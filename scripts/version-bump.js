@@ -8,9 +8,10 @@
  *  - iOS: CFBundleVersion + CFBundleShortVersionString (Info.plist)
  *
  * Version Types:
- *  patch → 1.0.(x+1) #1.0.0 → 1.0.1
- *  minor → 1.(x+1).0 #1.0.1 → 1.1.0
- *  major → (x+1).0.0 #1.1.0 → 2.0.0
+ *  patch → 1.0.(x+1)
+ *  minor → 1.(x+1).0
+ *  major → (x+1).0.0
+ *  code  → only versionCode +1 (versionName unchanged)
  */
 
 const fs = require('fs');
@@ -18,6 +19,13 @@ const path = require('path');
 const plist = require('plist');
 
 const bumpType = process.argv[2] || 'patch';
+const allowedTypes = ['patch', 'minor', 'major', 'code'];
+
+if (!allowedTypes.includes(bumpType)) {
+  console.error(`❌ Invalid bump type: ${bumpType}`);
+  console.error(`Allowed types: ${allowedTypes.join(', ')}`);
+  process.exit(1);
+}
 
 // ---------------------- VERSION BUMPER ----------------------
 function bump(version, type) {
@@ -104,10 +112,15 @@ function run() {
     );
   }
 
-  const data = JSON.parse(fs.readFileSync(versionFile));
+  const data = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
 
-  const newVersionName = bump(data.versionName, bumpType);
-  const newVersionCode = data.versionCode + 1;
+  let newVersionName = data.versionName;
+  let newVersionCode = data.versionCode + 1;
+
+  // Only bump versionName for patch/minor/major
+  if (bumpType !== 'code') {
+    newVersionName = bump(data.versionName, bumpType);
+  }
 
   updateAndroid(newVersionName, newVersionCode);
   updateIOS(newVersionName, newVersionCode);

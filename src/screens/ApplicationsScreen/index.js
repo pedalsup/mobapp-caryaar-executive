@@ -40,6 +40,25 @@ class ApplicationsScreen extends Component {
 
   componentDidMount() {
     this.fetchAllApplication();
+    this.focusListener = this.props.navigation.addListener('focus', () => {
+      const {loanFilterValue} = this.props;
+
+      if (loanFilterValue) {
+        this.setState(
+          {
+            activeFilterOption: loanFilterValue,
+            isSearch: false,
+            searchText: '',
+          },
+          async () => {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            this.fetchAllApplication(1, {
+              params: {status: loanFilterValue},
+            });
+          },
+        );
+      }
+    });
   }
 
   fetchAllApplication = (page = 1, param = {}) => {
