@@ -44,13 +44,13 @@ class AddPartnerBusinessLocation extends Component {
     const {locationDetails, route} = this.props;
     let navState = getScreenParam(route, 'params', null);
     let fromScreen = get(navState, 'fromScreen', false);
+
     if (fromScreen) {
       this.setState({
         showImages: get(navState, 'showImages', []),
         errorSteps: get(navState, 'errorSteps', []),
       });
     }
-
     this.setState({
       fromScreen: fromScreen,
       companyName: get(locationDetails, 'companyName', ''),

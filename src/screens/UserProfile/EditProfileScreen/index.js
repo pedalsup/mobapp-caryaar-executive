@@ -55,8 +55,6 @@ class EditProfileScreen extends Component {
       mobileNumber: this.state.mobileNumber,
     };
 
-    console.log(JSON.stringify(param));
-
     const isFormValid = this.validateAllFields();
 
     if (!isFormValid) {
